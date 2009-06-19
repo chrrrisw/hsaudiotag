@@ -49,7 +49,7 @@ def squeeze_mpeg(inpath, outpath):
 
 def expand_mpeg(filename):
     # takes the squeezed `filename`, expands it, and returns a file-like object
-    infile = open(filename)
+    infile = open(filename, 'rb')
     s = infile.read()
     re_squeezed = re.compile(r'\[SQUEEZED_FRAMES:(\d+?)\]')
     match = re_squeezed.search(s)
@@ -86,7 +86,7 @@ def squeeze_mp4(inpath, outpath):
 
 def expand_mp4(filename):
     # takes the squeezed `filename`, expands it, and returns a file-like object
-    infile = open(filename)
+    infile = open(filename, 'rb')
     s = infile.read()
     re_squeezed = re.compile(r'\[SQUEEZED_BYTES:(\d+?)\]')
     match = re_squeezed.search(s)
