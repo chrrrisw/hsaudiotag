@@ -1,9 +1,12 @@
 # coding: utf-8 
-# Unit Name: hsmedia.squeeze
 # Created By: Virgil Dupras
 # Created On: 2009-06-05
 # $Id$
 # Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+
+# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
+# which should be included with this package. The terms are also available at 
+# http://www.hardcoded.net/licenses/bsd_license
 
 # A problem with hsmedia is that the test data used from test units is usually copyrighted music.
 # Another problem is that they are usually big files. But, since this module only cares about

@@ -1,11 +1,11 @@
-#!/usr/bin/env python
-# Unit Name: hs.media.wma
 # Created By: Virgil Dupras
 # Created On: 2004/12/20
-# Last modified by:$Author: virgil $
-# Last modified on:$Date: 2009-05-28 15:21:53 +0200 (Thu, 28 May 2009) $
-#                  $Revision: 4384 $
+# $Id$
 # Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+
+# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
+# which should be included with this package. The terms are also available at 
+# http://www.hardcoded.net/licenses/bsd_license
 
 from __future__ import division
 

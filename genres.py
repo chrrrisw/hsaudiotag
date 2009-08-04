@@ -1,11 +1,11 @@
-#!/usr/bin/env python
-# Unit Name: hs.media.genres
 # Created By: Virgil Dupras
 # Created On: 2007/05/12
-# Last modified by:$Author: virgil $
-# Last modified on:$Date: 2009-01-23 17:43:24 +0100 (Fri, 23 Jan 2009) $
-#                  $Revision: 3970 $
+# $Id$
 # Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+
+# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
+# which should be included with this package. The terms are also available at 
+# http://www.hardcoded.net/licenses/bsd_license
 
 MUSIC_GENRES = (
 "Blues",
