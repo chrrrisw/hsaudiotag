@@ -62,13 +62,14 @@ def expand_mpeg(filename):
     result.write(s[:match.start()])
     frame_count = int(match.groups()[0])
     frame_string = s[match.end():match.end()+frame_count*4]
-    frames = ''
+    frames = []
     for i in range(frame_count):
         frame_data_string = frame_string[i*4:i*4+4]
         frame_data = unpack('!I', frame_data_string)[0]
         h = mpeg.MpegFrameHeader(frame_data)
         assert h.valid
-        frames += frame_data_string + (chr(0) * (h.size - 4))
+        frames.append(frame_data_string + (chr(0) * (h.size - 4)))
+    frames = ''.join(frames)
     result.write(frames)
     result.write(s[match.end()+frame_count*4:])
     result.seek(0, 0)
