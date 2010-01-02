@@ -1,6 +1,5 @@
 # Created By: Virgil Dupras
 # Created On: 2007/05/12
-# $Id$
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 
 # This software is licensed under the "BSD" License as described in the "LICENSE" file, 
