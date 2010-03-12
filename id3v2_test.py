@@ -18,7 +18,7 @@ class TCId3v2(TestCase):
         self.assertEqual(tag.size,4096)
         self.assertEqual(tag.data_size,4086)
         self.assert_(tag.exists)
-        self.assertEqual(tag.flags,())
+        self.assertEqual(tag.flags, 0)
         self.assertEqual(tag.title,'La Primavera')
         self.assertEqual(tag.artist,'Manu Chao')
         self.assertEqual(tag.album,'Proxima Estacion Esperanza (AD')

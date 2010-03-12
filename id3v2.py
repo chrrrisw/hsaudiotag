@@ -12,7 +12,7 @@ import cStringIO
 import struct
 import re
 
-from hsutil.misc import cond, StrToFlags, tryint
+from hsutil.misc import cond, tryint
 from hsutil.files import FileOrPath
 
 from .genres import MUSIC_GENRES
@@ -20,10 +20,10 @@ from .genres import MUSIC_GENRES
 ID_ID3 = 'ID3'
 ID_3DI = '3DI'
 #The id3 flags are backwards
-FLAG_UNSYNCH = 7
-FLAG_EXT_HEADER = 6
-FLAG_EXPERIMENTAL = 5
-FLAG_FOOTER = 4
+FLAG_UNSYNCH = 1 << 7
+FLAG_EXT_HEADER = 1 << 6
+FLAG_EXPERIMENTAL = 1 << 5
+FLAG_FOOTER = 1 << 4
 
 POS_BEGIN = 0
 POS_END   = 1
@@ -75,16 +75,16 @@ class Header(object):
         self.tagsize = 0 # size of the whole tag (datasize + header + footer)
         self.vmajor = 0
         self.vminor = 0
-        self.hflags = ()
+        self.hflags = 0
         header = fp.read(SIZE_HEADER)
         if header[0:3] != header_id:
             return
         self.vmajor = ord(header[3])
         self.vminor = ord(header[4])
-        self.hflags = StrToFlags(header[5])
+        self.hflags = ord(header[5])
         self.datasize = _read_id3_size(header[6:10], syncsafe=True)
         self.tagsize = self.datasize + SIZE_HEADER
-        if FLAG_FOOTER in self.hflags:
+        if FLAG_FOOTER & self.hflags:
             self.tagsize += SIZE_FOOTER
     
     @property
@@ -184,7 +184,7 @@ class Id3v23Frame(Id3Frame):
     def __init__(self, fp, syncsafe):
         frameid = fp.read(4)
         size = _read_id3_size(fp.read(4), syncsafe=syncsafe)
-        flags = StrToFlags(fp.read(2))
+        flags = fp.read(2)
         Id3Frame.__init__(self, fp, frameid, size)
 
 class Id3v2(object):
@@ -210,7 +210,7 @@ class Id3v2(object):
             self._header = h
             if self.exists:
                 data = cStringIO.StringIO(fp.read(self.data_size))
-                if FLAG_EXT_HEADER in self.flags:
+                if FLAG_EXT_HEADER & self.flags:
                     self._extheader = ExtHeader(data, self._header.vmajor)
                 self._read_frames(data)
     
