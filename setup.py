@@ -14,6 +14,7 @@ setup(
     author_email='hsoft@hardcoded.net',
     packages=['hsaudiotag'],
     scripts=[],
+    install_requires=['hsutil>=1.0.0'],
     url='http://hg.hardcoded.net/hsaudiotag/',
     license='BSD License',
     description='Read metdata (tags) of mp3, mp4, wma, ogg, flac and aiff files.',

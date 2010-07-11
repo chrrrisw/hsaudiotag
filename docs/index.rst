@@ -1,6 +1,6 @@
-====================================
+=====================================
 hsaudiotag - Read audio file metadata
-====================================
+=====================================
 
 :Author: `Hardcoded Software <http://www.hardcoded.net>`_
 :Dev website: http://hg.hardcoded.net/hsaudiotag
