@@ -7,7 +7,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-# A problem with hsmedia is that the test data used from test units is usually copyrighted music.
+# A problem with hsaudiotag is that the test data used from test units is usually copyrighted music.
 # Another problem is that they are usually big files. But, since this module only cares about
 # metadata, we can get rid of the content itself. This unit serves this purpose. It replaces content
 # with placeholders, which will be expanded back with null data when the test unit needs the file.

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# hsmedia documentation build configuration file, created by
+# hsaudiotag documentation build configuration file, created by
 # sphinx-quickstart on Fri Mar 12 13:12:28 2010.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -37,7 +37,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'hsmedia'
+project = u'hsaudiotag'
 copyright = u'2010, Hardcoded Software'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -158,7 +158,7 @@ html_theme = 'default'
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'hsmediadoc'
+htmlhelp_basename = 'hsaudiotagdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -172,7 +172,7 @@ htmlhelp_basename = 'hsmediadoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'hsmedia.tex', u'hsmedia Documentation',
+  ('index', 'hsaudiotag.tex', u'hsaudiotag Documentation',
    u'Virgil Dupras', 'manual'),
 ]
 

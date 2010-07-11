@@ -1,9 +1,9 @@
-Using hsmedia
-=============
+Using hsaudiotag
+================
 
-To read a file's metadata with ``hsmedia``, pick a class corresponding to the file you want to read, create an instance of it with the a file object or a filename as an argument, and fetch the attributes from it. For example, if you want to fetch attributes from a mp4 file, you'd do::
+To read a file's metadata with ``hsaudiotag``, pick a class corresponding to the file you want to read, create an instance of it with the a file object or a filename as an argument, and fetch the attributes from it. For example, if you want to fetch attributes from a mp4 file, you'd do::
 
-    >>> from hsmedia import mp4
+    >>> from hsaudiotag import mp4
     >>> myfile = mp4.File('foo.m4a')
     >>> myfile.artist
     'Built To Spill'
