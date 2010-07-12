@@ -7,34 +7,34 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 import unittest
-import StringIO
+import io
 
 from . import mp4
 from .squeeze import expand_mp4
 from .testcase import TestCase
 
-class StubReader(StringIO.StringIO):
+class StubReader(io.BytesIO):
     """This class is to allow myself to remove the .seek .read code from mp4.Atom
     because an Atom will always be a child to another atom. only RootAtom will not.
     """
-    def read(self,startat,readcount = -1):
+    def read(self, startat, readcount = -1):
         self.seek(startat)
-        return StringIO.StringIO.read(self, readcount)
+        return io.BytesIO.read(self, readcount)
 
 class TCMp4Atom(TestCase):
     """Test mp4.Atom class.
 
     The goal of this testcase is to test mp4.Atom with all kind
     of test atoms not necessarely from m4a files (garbage, hypothetic atoms).
-    Call CreateAtom(str) to create an atom that reads from a stub
+    Call CreateAtom(data) to create an atom that reads from a stub
     created with str.
     """
-    def CreateAtom(self,str,atomtype=mp4.Atom):
-        return atomtype(StubReader(str),0)
+    def CreateAtom(self, data, atomtype=mp4.Atom):
+        return atomtype(StubReader(data), 0)
 
     def test_empty(self):
         """A 0 byte atom"""
-        atom = self.CreateAtom('')
+        atom = self.CreateAtom(b'')
         self.assertEqual(atom.valid,False)
         self.assertEqual(atom.size,0)
         self.assertEqual(atom.type,'')
@@ -42,7 +42,7 @@ class TCMp4Atom(TestCase):
 
     def test_minimal(self):
         """A 8 bytes 'aaaa' atom"""
-        atom = self.CreateAtom('\x00\x00\x00\x08aaaa')
+        atom = self.CreateAtom(b'\x00\x00\x00\x08aaaa')
         self.assertEqual(atom.valid,True)
         self.assertEqual(atom.size,8)
         self.assertEqual(atom.type,'aaaa')
@@ -53,75 +53,75 @@ class TCMp4Atom(TestCase):
         When this hapens, the size attribute is set to the actual
         size of the read data.
         """
-        atom = self.CreateAtom('\x00\x00\x00\x0caaaa')
+        atom = self.CreateAtom(b'\x00\x00\x00\x0caaaa')
         self.assertEqual(atom.valid,True)
         self.assertEqual(atom.size,12)
         self.assertEqual(atom.type,'aaaa')
 
     def test_alphabet(self):
         """An 'alph' atom with the whole alphabet in it."""
-        atom = self.CreateAtom('\x00\x00\x00\x22alphabcdefghijklmnopqrstuvwxyz')
+        atom = self.CreateAtom(b'\x00\x00\x00\x22alphabcdefghijklmnopqrstuvwxyz')
         self.assertEqual(atom.valid,True)
         self.assertEqual(atom.size,34)
         self.assertEqual(atom.type,'alph')
-        self.assertEqual(atom.read(0,10),'abcdefghij')
-        self.assertEqual(atom.read(0),'abcdefghijklmnopqrstuvwxyz')
+        self.assertEqual(atom.read(0,10),b'abcdefghij')
+        self.assertEqual(atom.read(0),b'abcdefghijklmnopqrstuvwxyz')
 
     def test_withinbox(self):
         """Test the attributes of an Atom that is within another atom"""
-        atom = self.CreateAtom('\x00\x00\x00\x42box1\x00\x00\x00\x08sub1\x00\x00\x00\x08sub2\x00\x00\x00\x08sub3\x00\x00\x00\x22sub4abcdefghijklmnopqrstuvwxyz', mp4.AtomBox).atoms[3]
+        atom = self.CreateAtom(b'\x00\x00\x00\x42box1\x00\x00\x00\x08sub1\x00\x00\x00\x08sub2\x00\x00\x00\x08sub3\x00\x00\x00\x22sub4abcdefghijklmnopqrstuvwxyz', mp4.AtomBox).atoms[3]
         self.assertEqual(atom.valid,True)
         self.assertEqual(atom.size,34)
         self.assertEqual(atom.type,'sub4')
-        self.assertEqual(atom.read(0,10),'abcdefghij')
-        self.assertEqual(atom.read(0),'abcdefghijklmnopqrstuvwxyz')
+        self.assertEqual(atom.read(0,10),b'abcdefghij')
+        self.assertEqual(atom.read(0),b'abcdefghijklmnopqrstuvwxyz')
         self.assertEqual(atom.start_offset,24)
         self.assert_(isinstance(atom.parent,mp4.AtomBox))
 
     def test_data1(self):
         """Test the data of an atom. str field"""
-        atom = self.CreateAtom('\x00\x00\x00\x22dataabcdefghijklmnopqrstuvwxyz')
+        atom = self.CreateAtom(b'\x00\x00\x00\x22dataabcdefghijklmnopqrstuvwxyz')
         atom.cls_data_model = '*s'
-        self.assertEqual(atom.data[0],'abcdefghijklmnopqrstuvwxyz')
+        self.assertEqual(atom.data[0],b'abcdefghijklmnopqrstuvwxyz')
 
     def test_data2(self):
         """Test the data of an atom. int field"""
-        atom = self.CreateAtom('\x00\x00\x00\x0cdata\x01\x02\x03\x04')
+        atom = self.CreateAtom(b'\x00\x00\x00\x0cdata\x01\x02\x03\x04')
         atom.cls_data_model = 'i'
         self.assertEqual(atom.data[0],0x01020304)
 
     def test_data3(self):
         """Test the data of an atom. 2 short fields + str"""
-        atom = self.CreateAtom('\x00\x00\x00\x13data\x01\x02\x03\x04aybabtu')
+        atom = self.CreateAtom(b'\x00\x00\x00\x13data\x01\x02\x03\x04aybabtu')
         atom.cls_data_model = '2H*s'
         self.assertEqual(atom.data[0],0x0102)
         self.assertEqual(atom.data[1],0x0304)
-        self.assertEqual(atom.data[2],'aybabtu')
+        self.assertEqual(atom.data[2],b'aybabtu')
 
     def test_data4(self):
         """Test the data of an atom. a str field at the end, but with a len descriptor"""
-        atom = self.CreateAtom('\x00\x00\x00\x13data\x01\x02\x03\x04aybabtu')
+        atom = self.CreateAtom(b'\x00\x00\x00\x13data\x01\x02\x03\x04aybabtu')
         atom.cls_data_model = '2H7s'
         self.assertEqual(atom.data[0],0x0102)
         self.assertEqual(atom.data[1],0x0304)
-        self.assertEqual(atom.data[2],'aybabtu')
+        self.assertEqual(atom.data[2],b'aybabtu')
 
     def test_data5(self):
         """Test the data of an atom. a str field at the end, but with a len descriptor that is not long enough"""
-        atom = self.CreateAtom('\x00\x00\x00\x13data\x01\x02\x03\x04aybabtu')
+        atom = self.CreateAtom(b'\x00\x00\x00\x13data\x01\x02\x03\x04aybabtu')
         atom.cls_data_model = '2H4s'
         self.assertEqual(atom.data[0],0x0102)
         self.assertEqual(atom.data[1],0x0304)
-        self.assertEqual(atom.data[2],'ayba')
+        self.assertEqual(atom.data[2],b'ayba')
         self.assertEqual(len(atom.data),3)
 
     def test_data6(self):
         """Test the data of an atom. a str field at the end, but with a len descriptor that is too long"""
-        atom = self.CreateAtom('\x00\x00\x00\x13data\x01\x02\x03\x04aybabtu')
+        atom = self.CreateAtom(b'\x00\x00\x00\x13data\x01\x02\x03\x04aybabtu')
         atom.cls_data_model = '2H9s'
         self.assertEqual(atom.data[0],0x0102)
         self.assertEqual(atom.data[1],0x0304)
-        self.assertEqual(atom.data[2],'aybabtu  ')
+        self.assertEqual(atom.data[2],b'aybabtu  ')
 
 
 class TCMp4AtomBox(TestCase):
@@ -129,35 +129,35 @@ class TCMp4AtomBox(TestCase):
 
     The goal of this testcase is to test mp4.Atom with all kind
     of test atoms not necessarely from m4a files (garbage, hypothetic atoms).
-    Call CreateAtom(str) to create an atom that reads from a stub
+    Call CreateAtom(data) to create an atom that reads from a stub
     created with str.
     """
-    def CreateAtom(self,str):
-        return mp4.AtomBox(StubReader(str),0)
+    def CreateAtom(self, data):
+        return mp4.AtomBox(StubReader(data),0)
 
     def test_empty(self):
         """A 0 byte atom"""
-        atom = self.CreateAtom('')
+        atom = self.CreateAtom(b'')
         self.assertEqual(atom.atoms,())
 
     def test_minimal(self):
         """A 8 bytes 'aaaa' atom"""
-        atom = self.CreateAtom('\x00\x00\x00\x08aaaa')
+        atom = self.CreateAtom(b'\x00\x00\x00\x08aaaa')
         self.assertEqual(atom.atoms,())
 
     def test_box1(self):
         """A 'box1' atom with 4 subatoms in it."""
-        atom = self.CreateAtom('\x00\x00\x00\x42box1\x00\x00\x00\x08sub1\x00\x00\x00\x08sub2\x00\x00\x00\x08sub3\x00\x00\x00\x22sub4abcdefghijklmnopqrstuvwxyz')
+        atom = self.CreateAtom(b'\x00\x00\x00\x42box1\x00\x00\x00\x08sub1\x00\x00\x00\x08sub2\x00\x00\x00\x08sub3\x00\x00\x00\x22sub4abcdefghijklmnopqrstuvwxyz')
         self.assertEqual(len(atom.atoms),4)
 
     def test_box2(self):
         """A 'box2' atom with 3 subatoms in it and some data before."""
-        atom = self.CreateAtom('\x00\x00\x00\x42box1\x00\x00\x00\x08sub1\x00\x00\x00\x08sub2\x00\x00\x00\x08sub3\x00\x00\x00\x22sub4abcdefghijklmnopqrstuvwxyz')
+        atom = self.CreateAtom(b'\x00\x00\x00\x42box1\x00\x00\x00\x08sub1\x00\x00\x00\x08sub2\x00\x00\x00\x08sub3\x00\x00\x00\x22sub4abcdefghijklmnopqrstuvwxyz')
         atom.cls_data_model = '2H4s'
         self.assertEqual(len(atom.atoms),3)
         self.assertEqual(atom.data[0],0x0000)
         self.assertEqual(atom.data[1],0x0008)
-        self.assertEqual(atom.data[2],'sub1')
+        self.assertEqual(atom.data[2],b'sub1')
         self.assertEqual(atom.atoms[0].type,'sub2')
 
 class TCMp4FileTest1(TestCase):
@@ -488,12 +488,12 @@ class TCMp4Filetest3(TestCase):
         self.file = mp4.File(expand_mp4(self.filepath('mp4/test3.m4a')))
 
     def test_info(self):
-        self.assert_(isinstance(self.file.title,unicode))
-        self.assert_(isinstance(self.file.artist,unicode))
-        self.assert_(isinstance(self.file.title,unicode))
-        self.assertEqual(u'J\'ai oubli\u00e9',self.file.title)
-        self.assert_(isinstance(self.file.artist,unicode))
-        self.assertEqual(u'Capitaine R\u00e9volte',self.file.artist)
+        self.assert_(isinstance(self.file.title,str))
+        self.assert_(isinstance(self.file.artist,str))
+        self.assert_(isinstance(self.file.title,str))
+        self.assertEqual('J\'ai oubli\u00e9',self.file.title)
+        self.assert_(isinstance(self.file.artist,str))
+        self.assertEqual('Capitaine R\u00e9volte',self.file.artist)
         self.assertEqual('Danse sociale',self.file.album)
         self.assertEqual('Punk',self.file.genre)
         self.assertEqual('',self.file.comment)
@@ -548,7 +548,7 @@ class TCMp4File_non_ascii_genre(TestCase):
         self.file = mp4.File(self.filepath('mp4/non_ascii_genre.m4a'))
 
     def test_genre(self):
-        self.assertEqual(u'\xe9', self.file.genre)
+        self.assertEqual('\xe9', self.file.genre)
     
 
 if __name__ == "__main__":

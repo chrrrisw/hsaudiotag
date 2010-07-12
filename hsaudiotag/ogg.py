@@ -14,7 +14,7 @@ class InvalidFileError(Exception):
     pass
 
 class VorbisPage(object):
-    OGG_PAGE_ID = 'OggS'
+    OGG_PAGE_ID = b'OggS'
     BASE_SIZE = 0x1b
     MAX_SIZE = 0x1b + 0xff
     def __init__(self, fp):
@@ -28,11 +28,11 @@ class VorbisPage(object):
         self.page_number = page_number
         self.position = position
         segments = data[self.BASE_SIZE:self.BASE_SIZE+segment_count]
-        page_size = sum(ord(segment) for segment in segments)
+        page_size = sum(segments)
         self.size = page_size
         self.header_size = self.BASE_SIZE + segment_count
     
-    def next(self):
+    def __next__(self):
         self.fp.seek(self.start_offset + self.header_size + self.size)
         return VorbisPage(self.fp)
     
@@ -44,8 +44,8 @@ class VorbisPage(object):
 class VorbisComment(object):
     def __init__(self, data):
         def get_field(field_name):
-            data = meta_data.get(field_name, '')
-            return unicode(data, 'utf-8')
+            data = meta_data.get(field_name, b'')
+            return str(data, 'utf-8')
         
         [vendor_string_length] = unpack('<I', data[:4])
         meta_data_offset = vendor_string_length + 4
@@ -55,18 +55,18 @@ class VorbisComment(object):
         for _ in range(meta_count):
             [length] = unpack('<I',data[offset:offset+4])
             value = data[offset+4:offset+length+4]
-            splitted = value.split('=')
+            splitted = value.split(b'=')
             meta_data[splitted[0]] = splitted[1]
             offset += length + 4
-        self.artist = get_field('ARTIST')
-        self.album = get_field('ALBUM')
-        self.title = get_field('TITLE')
-        self.genre = get_field('GENRE')
-        self.track = int(meta_data.get('TRACKNUMBER', 0))
-        self.comment = get_field('COMMENT')
-        self.year = meta_data.get('DATE', '')
+        self.artist = get_field(b'ARTIST')
+        self.album = get_field(b'ALBUM')
+        self.title = get_field(b'TITLE')
+        self.genre = get_field(b'GENRE')
+        self.track = int(meta_data.get(b'TRACKNUMBER', 0))
+        self.comment = get_field(b'COMMENT')
+        self.year = get_field(b'DATE')
         if not self.year:
-            description = get_field('DESCRIPTION')
+            description = get_field(b'DESCRIPTION')
             if 'YEAR: ' in description:
                 index = description.find('YEAR: ')
                 self.year = description[index+6:index+10]
@@ -74,7 +74,7 @@ class VorbisComment(object):
 
 class Vorbis(object):
     def __init__(self, infile):
-        with FileOrPath(infile) as fp:
+        with FileOrPath(infile, 'rb') as fp:
             try:
                 self._read(fp)
             except Exception: #The unpack error doesn't seem to have a class. I have to catch all here
@@ -107,17 +107,17 @@ class Vorbis(object):
         unpacked = unpack('<7sIB4I2B', data[:30])
         (file_id, version, channel_mode, sample_rate, bitrate_max, bitrate_nominal, bitrate_max, 
             block_size, stop_flag) = unpacked
-        if file_id != '\x01vorbis':
+        if file_id != b'\x01vorbis':
             raise InvalidFileError()
         self.sample_rate = sample_rate
         self.bitrate = bitrate_nominal // 1000
         
         #Read 2nd page
-        page = page.next()
+        page = next(page)
         if not page.valid:
             raise InvalidFileError()
         data = page.read()
-        if data[:7] != '\x03vorbis':
+        if data[:7] != b'\x03vorbis':
             raise InvalidFileError()
         comment = VorbisComment(data[7:])
         self.artist = comment.artist
@@ -129,7 +129,7 @@ class Vorbis(object):
         self.comment = comment.comment
         
         #Get third page for audio_offset
-        page = page.next()
+        page = next(page)
         if not page.valid:
             raise InvalidFileError()
         self.audio_offset = page.start_offset

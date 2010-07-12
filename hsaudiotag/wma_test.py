@@ -43,8 +43,8 @@ class TCWma(TestCase):
     def test1_non_ascii(self):
         # The album is Unicode
         w = wma.WMADecoder(self.filepath('wma/test1_non_ascii.wma'))
-        self.assert_(isinstance(w.album, unicode))
-        self.assertEqual(w.album, u'The Moon \u00c8 Antarctica')
+        self.assert_(isinstance(w.album, str))
+        self.assertEqual(w.album, 'The Moon \u00c8 Antarctica')
     
     def test1_no_track(self):
         # This is a file with no WM/TRACK field

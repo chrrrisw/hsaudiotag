@@ -6,7 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from __future__ import division
+
 
 import re
 import struct
@@ -23,7 +23,9 @@ re_atom_type = re.compile(r'[A-Za-z0-9\-\xa9]{4}')
 def read_atom_header(readfunc, offset):
     header = readfunc(offset, HEADER_SIZE)
     if len(header) == HEADER_SIZE:
-        return tuple(struct.unpack('!i4s',header))
+        size, byte_type = struct.unpack('!i4s', header)
+        str_type = str(byte_type, 'latin-1')
+        return (size, str_type)
     else:
         return ()
 
@@ -153,7 +155,7 @@ class AttributeDataAtom(Atom):
     def _read_atom_data(self):
         result = Atom._read_atom_data(self)
         #Convert to unicode if needed
-        if (isinstance(result[2], basestring)) and any(ord(c) >= 0x80 for c in result[2]):
+        if isinstance(result[2], bytes):
             result = list(result)
             result[2] = result[2].decode('utf-8')
             result = tuple(result)
@@ -202,9 +204,9 @@ class MdhdAtom(Atom):
 class StsdAtom(AtomBox):
     def _get_data_model(self):
         [version] = struct.unpack('4s', self.read(12, 4))
-        if version in ('mp4v', 'avc1', 'encv', 's263'):
+        if version in (b'mp4v', b'avc1', b'encv', b's263'):
             return'94s'
-        elif version in ('mp4a', 'drms', 'enca', 'samr', 'sawb'):
+        elif version in (b'mp4a', b'drms', b'enca', b'samr', b'sawb'):
             return '44s'
         else:
             return '24s'
@@ -295,7 +297,7 @@ class File(AtomBox):
         data = self._get_attr('moov.udta.meta.ilst.gnre')
         if not data:
             data = self._get_attr('moov.udta.meta.ilst.\xa9gen')
-        if isinstance(data, basestring):
+        if isinstance(data, str):
             return data
         elif isinstance(data, int):
             return MUSIC_GENRES[data - 1]

@@ -38,7 +38,7 @@ class MetaDataBlockHeader(object):
         self.file.seek(self.offset + self.HEADER_SIZE)
         return BLOCK_CLASSES.get(self.type, MetaDataBlock)(self.file, self)
 
-    def next(self):
+    def __next__(self):
         self.file.seek(self.offset + self.HEADER_SIZE + self.size)
         return MetaDataBlockHeader(self.file)
 
@@ -67,7 +67,7 @@ BLOCK_CLASSES = {
 }
 
 class FLAC(object):
-    ID = "fLaC"
+    ID = b'fLaC'
     def __init__(self, infile):
         with FileOrPath(infile) as fp:
             fp.seek(0, 2)
@@ -126,12 +126,12 @@ class FLAC(object):
         while header.valid:
             if header.type == type:
                 return header.data()
-            header = header.next()
+            header = next(header)
     
     def get_last_block(self):
         header = self.first_header
         while header.valid:
             if header.last_before_audio:
                 return header
-            header = header.next()
+            header = next(header)
     

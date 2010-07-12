@@ -13,7 +13,7 @@
 # with placeholders, which will be expanded back with null data when the test unit needs the file.
 
 import re
-from cStringIO import StringIO
+from io import BytesIO
 from struct import unpack
 
 from . import mpeg, id3v2, mp4
@@ -21,7 +21,7 @@ from . import mpeg, id3v2, mp4
 def squeeze_mpeg(inpath, outpath):
     # takes the file in `inpath`, squeezes it, and put the result in `outpath`
     s = open(inpath).read()
-    infile = StringIO(s)
+    infile = BytesIO(s)
     tag = id3v2.Id3v2(infile)
     start_offset = tag.size if (tag.exists and tag.position == id3v2.POS_BEGIN) else 0
     infile.seek(start_offset, 0)
@@ -38,10 +38,10 @@ def squeeze_mpeg(inpath, outpath):
     while fb.frame.valid:
         frames += s[fb.position:fb.position+4]
         last_pos = fb.position
-        fb.next()
+        next(fb)
     frames = frames[:-4] # remove the last frame
     if not frames:
-        print 'Couldn\'t find frames', fb.position
+        print('Couldn\'t find frames', fb.position)
     frame_count = len(frames) // 4
     result += '[SQUEEZED_FRAMES:%d]' % frame_count
     result += frames
@@ -54,10 +54,10 @@ def expand_mpeg(filename):
     infile = open(filename, 'rb')
     s = infile.read()
     re_squeezed = re.compile(r'\[SQUEEZED_FRAMES:(\d+?)\]')
-    match = re_squeezed.search(s)
+    match = re_squeezed.search(str(s, 'latin-1'))
     if match is None:
-        return StringIO(s)
-    result = StringIO()
+        return BytesIO(s)
+    result = BytesIO()
     result.write(s[:match.start()])
     frame_count = int(match.groups()[0])
     frame_string = s[match.end():match.end()+frame_count*4]
@@ -67,8 +67,8 @@ def expand_mpeg(filename):
         frame_data = unpack('!I', frame_data_string)[0]
         h = mpeg.MpegFrameHeader(frame_data)
         assert h.valid
-        frames.append(frame_data_string + (chr(0) * (h.size - 4)))
-    frames = ''.join(frames)
+        frames.append(frame_data_string + (b'\0' * (h.size - 4)))
+    frames = b''.join(frames)
     result.write(frames)
     result.write(s[match.end()+frame_count*4:])
     result.seek(0, 0)
@@ -92,13 +92,13 @@ def expand_mp4(filename):
     infile = open(filename, 'rb')
     s = infile.read()
     re_squeezed = re.compile(r'\[SQUEEZED_BYTES:(\d+?)\]')
-    match = re_squeezed.search(s)
+    match = re_squeezed.search(str(s, 'latin-1'))
     if match is None:
-        return StringIO(s)
-    result = StringIO()
+        return BytesIO(s)
+    result = BytesIO()
     result.write(s[:match.start()])
     byte_count = int(match.groups()[0])
-    result.write(chr(0) * byte_count)
+    result.write(b'\0' * byte_count)
     result.write(s[match.end():])
     result.seek(0, 0)
     return result

@@ -30,7 +30,7 @@ class TCMetaDataBlockHeader(TestCase):
         header = flac.MetaDataBlockHeader(fp)
         self.assert_(header.valid)
         self.assertEqual(flac.STREAMINFO, header.type)
-        header = header.next()
+        header = next(header)
         self.assertTrue(header.valid)
         self.assertEqual(flac.SEEKTABLE, header.type)
         fp.close()
@@ -42,7 +42,7 @@ class TCMetaDataBlockHeader(TestCase):
         count = 0
         while header.valid:
             count += 1
-            header = header.next()
+            header = next(header)
         self.assertEqual(4496, header.offset)
         self.assertEqual(4, count)
         fp.close()
@@ -77,7 +77,7 @@ class TCVorbisComment(TestCase):
         fp.seek(4, 0)
         header = flac.MetaDataBlockHeader(fp)
         while header.type != flac.VORBIS_COMMENT:
-            header = header.next()
+            header = next(header)
         self.assert_(header.valid)
         block = header.data()
         comment = block.comment

@@ -78,8 +78,8 @@ Enjoy your copy of MusicMatch Jukebox!"""
     def test_non_ascii_non_unicode(self):
         #Test a v2 tag with non-ascii char in a non-unicode string
         tag = Id3v2(self.filepath('id3v2/ozzy_non_ascii.tag'))
-        self.assert_(isinstance(tag.title,unicode))
-        self.assertEqual(tag.title,u'Bark At The \u00c8\u00c9\u00ca\u00cb')
+        self.assert_(isinstance(tag.title,str))
+        self.assertEqual(tag.title,'Bark At The \u00c8\u00c9\u00ca\u00cb')
     
     def test_numeric_genre(self):
         #A file with a genre field containing (<number>)
@@ -166,7 +166,7 @@ Enjoy your copy of MusicMatch Jukebox!"""
         # On BE machines, it results in a badly interpreted tag. I've tried hard to fake a BE 
         # machine here, but it didn't work, so this test is kind of worthless unless ran on a BE 
         # machine.
-        self.assertEqual(u'foobar', _read_id3_string(u'foobar'.encode('utf-16le'), 1))
+        self.assertEqual('foobar', _read_id3_string('foobar'.encode('utf-16le'), 1))
     
 
 class TCHeader(TestCase):

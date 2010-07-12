@@ -7,7 +7,7 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 import unittest
-import StringIO
+import io
 
 from . import mpeg
 from .squeeze import expand_mpeg
@@ -173,7 +173,7 @@ class TCMpeg(TestCase):
     
     def test_tell_returns_None(self):
         #See TCFrameBrowser test with the same name for comments
-        fp = StringIO.StringIO('')
+        fp = io.BytesIO(b'')
         fp.tell = lambda:None
         m = mpeg.Mpeg(fp)
         self.assertEqual(0,m.size)
@@ -191,7 +191,7 @@ class TCFrameBrowser(TestCase):
         b = mpeg.FrameBrowser(fp)
         self.assertEqual(0,b.frame_index)
         self.assertEqual(128,b.frame.bitrate)
-        self.assertEqual(128,b.next().bitrate)
+        self.assertEqual(128,next(b).bitrate)
         self.assertEqual(1,b.frame_index)
         fp.close()
     
@@ -199,16 +199,16 @@ class TCFrameBrowser(TestCase):
         fp = expand_mpeg(self.filepath('mpeg/test2.mp3'))
         b = mpeg.FrameBrowser(fp)
         self.assertEqual(128,b.frame.bitrate)
-        self.assertEqual(128,b.next().bitrate)
+        self.assertEqual(128,next(b).bitrate)
         fp.close()
     
     def test_stop_going_foward_when_frame_is_invalid(self):
         fp = expand_mpeg(self.filepath('mpeg/test2.mp3'))
         b = mpeg.FrameBrowser(fp)
-        while b.next().valid:
+        while next(b).valid:
             pass
         i = b.frame_index
-        b.next()
+        next(b)
         self.assertEqual(i,b.frame_index)
         fp.close()
     
@@ -216,7 +216,7 @@ class TCFrameBrowser(TestCase):
         fp = expand_mpeg(self.filepath('mpeg/test2.mp3'))
         b = mpeg.FrameBrowser(fp)
         p = b.position
-        b.next()
+        next(b)
         self.assert_(b.position > p)
         fp.close()
     
@@ -224,7 +224,7 @@ class TCFrameBrowser(TestCase):
         fp = expand_mpeg(self.filepath('mpeg/test6.mp3'))
         b = mpeg.FrameBrowser(fp)
         first_br = b.frame.bitrate
-        b.next()
+        next(b)
         self.assertEqual(first_br,b.first().bitrate)
         self.assertEqual(0,b.frame_index)
         fp.close()
@@ -251,14 +251,14 @@ class TCFrameBrowser(TestCase):
         #None once. So I added code to work around this. But then, some time later,
         #I removed that code, and the test units continued to work A-OK. I *know* it can
         #happen. Thus, I fake it here because I can't find what conditions makes this possible.
-        fp = StringIO.StringIO('')
+        fp = io.BytesIO(b'')
         fp.tell = lambda:None
         b = mpeg.FrameBrowser(fp)
         self.assertEqual(0,b.position)
     
     def test_stats_on_one_second(self):
         """one_second has exactly one second worth of mpeg frames (39 * 417 bytes @ 128)"""
-        fp = open(self.filepath('mpeg/one_second.mp3'))
+        fp = open(self.filepath('mpeg/one_second.mp3'), 'rb')
         b = mpeg.FrameBrowser(fp)
         fcount, size = b.stats()
         self.assertEqual(fcount, 39)

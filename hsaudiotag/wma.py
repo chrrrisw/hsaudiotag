@@ -6,33 +6,33 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from __future__ import division
+
 
 import struct
 from struct import unpack
-from cStringIO import StringIO
+from io import BytesIO
 
 from hsutil.files import FileOrPath
 
 #Object IDs
 WMA_ID_SIZE = 16
 WMA_OB_HEADER_SIZE = 20 #ID + Size
-WMA_HEADER_ID                       = '\x30\x26\xb2\x75\x8e\x66\xcf\x11\xa6\xd9\x00\xaa\x00\x62\xce\x6c'
-WMA_DATA_ID                         = '\x36\x26\xb2\x75\x8e\x66\xcf\x11\xa6\xd9\x00\xaa\x00\x62\xce\x6c'
-WMA_FILE_PROPERTIES_ID              = '\xa1\xdc\xab\x8c\x47\xa9\xcf\x11\x8e\xe4\x00\xc0\x0c\x20\x53\x65'
-WMA_STREAM_PROPERTIES_ID            = '\x91\x07\xdc\xb7\xb7\xa9\xcf\x11\x8e\xe6\x00\xc0\x0c\x20\x53\x65'
-WMA_CONTENT_DESCRIPTION_ID          = '\x33\x26\xb2\x75\x8e\x66\xcf\x11\xa6\xd9\x00\xaa\x00\x62\xce\x6c'
-WMA_EXTENDED_CONTENT_DESCRIPTION_ID = '\x40\xa4\xd0\xd2\x07\xe3\xd2\x11\x97\xf0\x00\xa0\xc9\x5e\xa8\x50'
-WMA_STREAM_BITRATE_PROPERTIES_ID    = '\xce\x75\xf8\x7b\x8d\x46\xd1\x11\x8d\x82\x00\x60\x97\xc9\xa2\xb2'
+WMA_HEADER_ID                       = b'\x30\x26\xb2\x75\x8e\x66\xcf\x11\xa6\xd9\x00\xaa\x00\x62\xce\x6c'
+WMA_DATA_ID                         = b'\x36\x26\xb2\x75\x8e\x66\xcf\x11\xa6\xd9\x00\xaa\x00\x62\xce\x6c'
+WMA_FILE_PROPERTIES_ID              = b'\xa1\xdc\xab\x8c\x47\xa9\xcf\x11\x8e\xe4\x00\xc0\x0c\x20\x53\x65'
+WMA_STREAM_PROPERTIES_ID            = b'\x91\x07\xdc\xb7\xb7\xa9\xcf\x11\x8e\xe6\x00\xc0\x0c\x20\x53\x65'
+WMA_CONTENT_DESCRIPTION_ID          = b'\x33\x26\xb2\x75\x8e\x66\xcf\x11\xa6\xd9\x00\xaa\x00\x62\xce\x6c'
+WMA_EXTENDED_CONTENT_DESCRIPTION_ID = b'\x40\xa4\xd0\xd2\x07\xe3\xd2\x11\x97\xf0\x00\xa0\xc9\x5e\xa8\x50'
+WMA_STREAM_BITRATE_PROPERTIES_ID    = b'\xce\x75\xf8\x7b\x8d\x46\xd1\x11\x8d\x82\x00\x60\x97\xc9\xa2\xb2'
 
 # Names of supported comment fields
-TITLE = 'WM/TITLE'
-ARTIST = 'WM/AUTHOR'
-ALBUM = 'WM/ALBUMTITLE'
-TRACK = 'WM/TRACK'
-YEAR = 'WM/YEAR'
-GENRE = 'WM/GENRE'
-DESCRIPTION = 'WM/DESCRIPTION'
+TITLE = b'WM/TITLE'
+ARTIST = b'WM/AUTHOR'
+ALBUM = b'WM/ALBUMTITLE'
+TRACK = b'WM/TRACK'
+YEAR = b'WM/YEAR'
+GENRE = b'WM/GENRE'
+DESCRIPTION = b'WM/DESCRIPTION'
 
 #Max. number of characters in tag field
 WMA_MAX_STRING_SIZE = 250;
@@ -48,7 +48,7 @@ class WMADecoder(object):
             return s.decode('utf-16-le')[:-1]
         except UnicodeDecodeError:
             try:
-                return (s + '\0').decode('utf-16-le')[:-1]
+                return (s + b'\0').decode('utf-16-le')[:-1]
             except UnicodeDecodeError:
                 return ''
     
@@ -138,7 +138,7 @@ class WMADecoder(object):
                     item_id = fp.read(WMA_ID_SIZE)
                     [item_size] = unpack("<i", fp.read(4))
                     if item_id in functions:
-                        functions[item_id](StringIO(fp.read(item_size - WMA_OB_HEADER_SIZE)))
+                        functions[item_id](BytesIO(fp.read(item_size - WMA_OB_HEADER_SIZE)))
                     else:
                         fp.seek(item_size - WMA_OB_HEADER_SIZE, 1)
                 self.artist = self._fields.get(ARTIST, '')

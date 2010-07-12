@@ -117,8 +117,8 @@ class TCId3v1(TestCase):
     
     def test_non_ascii(self):
         tag = Id3v1(self.filepath('id3v1/id3v1_non_ascii.mp3'))
-        self.assert_(isinstance(tag.title, unicode))
-        self.assertEqual(u'Title\u00c8', tag.title)
+        self.assert_(isinstance(tag.title, str))
+        self.assertEqual('Title\u00c8', tag.title)
     
     def test_newlines_and_return_carriage(self):
         tag = Id3v1(self.filepath('id3v1/id3v1_newlines.mp3'))

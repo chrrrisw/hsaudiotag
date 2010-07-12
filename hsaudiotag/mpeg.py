@@ -6,10 +6,10 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from __future__ import division
 
-import id3v1
-import id3v2
+
+from . import id3v1
+from . import id3v2
 import struct
 from struct import unpack
 
@@ -26,7 +26,7 @@ ID_LAYER1 = 3
 ID_LAYER2 = 2
 ID_LAYER3 = 1
 
-MPEG_SYNC = 0xffe00000L # 11 bits set
+MPEG_SYNC = 0xffe00000 # 11 bits set
 MPEG_PAD  = 0x200 #pad flag mask (pos 20)
 
 BR_NULL   = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -132,17 +132,17 @@ class MpegFrameHeader(object):
 
 class XingHeader(object):
     def __init__(self, data): #data is a 128 bytes str
-        self.valid = data[:4] == 'Xing'
+        self.valid = data[:4] == b'Xing'
         self.frames = unpack('!I', data[8:12])[0]
         self.size = unpack('!I', data[12:16])[0]
         self.scale = unpack('B', data[119])[0]
     
 class FhgHeader(object):
     def __init__(self, data):
-        self.valid = data[:4] == 'VBRI'
+        self.valid = data[:4] == b'VBRI'
         self.frames = unpack('!I', data[14:18])[0]
         self.size = unpack('!I', data[10:14])[0]
-        self.scale = unpack('B', data[9])[0]
+        self.scale = unpack('B', data[9:10])[0]
     
 class ComputedVBRHeader(object):
     def __init__(self, frame_browser):
@@ -179,7 +179,7 @@ class FrameBrowser(object):
             if h.valid:
                 self.position += tag_index + h.tagsize
                 return self._seek()
-        index = data.find('\xff')
+        index = data.find(b'\xff')
         while (index > -1):
             try:
                 result = MpegFrameHeader(unpack('!I', data[index:index+HEADER_SIZE])[0])
@@ -193,7 +193,7 @@ class FrameBrowser(object):
                             return True
                     except struct.error:
                         pass
-                index = data.find('\xff', index+1)
+                index = data.find(b'\xff', index+1)
             except struct.error:
                 index = -1
         return False
@@ -204,7 +204,7 @@ class FrameBrowser(object):
         self._read()
         return self.frame
     
-    def next(self):
+    def __next__(self):
         if self.frame.valid:
             self.fp.seek(self.position + self.frame.size, 0)
             self._read()
@@ -215,7 +215,7 @@ class FrameBrowser(object):
         """Iterates over all frames and return (frame_count, total_size)"""
         self.first()
         size = self.frame.size
-        while self.next().valid:
+        while next(self).valid:
             size += self.frame.size
         return (self.frame_index, size)
     
@@ -226,13 +226,13 @@ def get_vbr_info(fp, b):
     fp.seek(vbr_offset + 4, 1)
     vbr_id = fp.read(4)
     fp.seek(-4, 1)
-    if vbr_id == 'Xing':
+    if vbr_id == b'Xing':
         return XingHeader(fp.read(128))
-    if vbr_id == 'VBRI':
+    if vbr_id == b'VBRI':
         return FhgHeader(fp.read(18))
     br = b.frame.bitrate
     for i in range(4):
-        if b.next().bitrate != br:
+        if next(b).bitrate != br:
             return ComputedVBRHeader(b)
 
 class Mpeg(object):

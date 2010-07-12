@@ -29,12 +29,12 @@ def _arrange_id3_field(raw_field):
     This function takes only the part of the string before the first \0 char.
     After this, it checks if the string has to be converted to unicode and convert it if it indeed does.
     """
-    result = raw_field.split('\0')
+    decoded = str(raw_field, 'iso8859-1')
+    result = decoded.split('\0')
     if len(result) > 0:
         result = result[0].rstrip().replace('\n', ' ').replace('\r', ' ')
     else:
         result = ''
-    result = unicode(result, 'iso8859-1')
     return result
 
 class Id3v1(object):
@@ -59,13 +59,13 @@ class Id3v1(object):
             self._read_tag(fp.read(128))
     
     def _read_tag(self, data):
-        if data[0:3] != 'TAG':
+        if data[0:3] != b'TAG':
             return
         #check if the comment field contains track info
-        if ((data[125] == '\0') and (data[126] != '\0')) or ((data[125] == '\x20') and (data[126] != '\x20')):
+        if ((data[125] == 0) and (data[126] != 0)) or ((data[125] == 0x20) and (data[126] != 0x20)):
             #We have a v1.1
             self.version = TAG_VERSION_1_1
-            self.track = min(ord(data[126]), 99)
+            self.track = min(data[126], 99)
             self.comment = _arrange_id3_field(data[97:125])
         else:
             self.version = TAG_VERSION_1_0
@@ -75,7 +75,7 @@ class Id3v1(object):
         self.artist = _arrange_id3_field(data[33:63])
         self.album = _arrange_id3_field(data[63:93])
         self.year = _arrange_id3_field(data[93:97])
-        genre = ord(data[127])
+        genre = data[127]
         self.genre = MUSIC_GENRES[genre] if genre < len(MUSIC_GENRES) else ''
         self.size = 128
     
