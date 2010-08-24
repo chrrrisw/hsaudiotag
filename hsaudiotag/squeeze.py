@@ -20,7 +20,7 @@ from . import mpeg, id3v2, mp4
 
 def squeeze_mpeg(inpath, outpath):
     # takes the file in `inpath`, squeezes it, and put the result in `outpath`
-    s = open(inpath).read()
+    s = open(inpath, 'rb').read()
     infile = BytesIO(s)
     tag = id3v2.Id3v2(infile)
     start_offset = tag.size if (tag.exists and tag.position == id3v2.POS_BEGIN) else 0
@@ -28,10 +28,10 @@ def squeeze_mpeg(inpath, outpath):
     fb = mpeg.FrameBrowser(infile)
     # we don't want to squeeze the first frame because it might be a VBR header, which we want to
     # keep intact
-    if not fb.next().valid:
+    if not next(fb).valid:
         fb._seek()
     result = s[:fb.position] # add whatever's before the mpeg frames
-    frames = ''
+    frames = b''
     last_pos = fb.position
     # add all mpeg frame headers except the last (sometimes, the last frame is cut off. we don't
     # want to squeeze it, but to keep it intact.)
@@ -43,10 +43,10 @@ def squeeze_mpeg(inpath, outpath):
     if not frames:
         print('Couldn\'t find frames', fb.position)
     frame_count = len(frames) // 4
-    result += '[SQUEEZED_FRAMES:%d]' % frame_count
+    result += ('[SQUEEZED_FRAMES:%d]' % frame_count).encode('ascii')
     result += frames
     result += s[last_pos:] # add whatever's after the mpeg frames
-    outfile = open(outpath, 'w')
+    outfile = open(outpath, 'wb')
     outfile.write(result)
 
 def expand_mpeg(filename):
