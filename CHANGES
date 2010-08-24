@@ -1,4 +1,13 @@
+Changes
+=======
+
+Version 1.0.1 -- 2010/08/24
+---------------------------
+
+* Fixed squeeze.squeeze_mpeg under py3k.
+* Fixed the decoding of mpeg files with Xing headers under py3k.
+
 Version 1.0.0 -- 2010/07/11
----
+---------------------------
 
 * Initial Release

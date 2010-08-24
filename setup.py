@@ -7,17 +7,19 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3',
 ]
 
+LONG_DESC = open('README', 'rt').read() + '\n\n' + open('CHANGES', 'rt').read()
+
 setup(
     name='hsaudiotag3k',
-    version='1.0.0',
+    version='1.0.1',
     author='Hardcoded Software',
     author_email='hsoft@hardcoded.net',
     packages=['hsaudiotag'],
     scripts=[],
-    install_requires=['hsutil3k>=1.0.0', 'py>=1.3.2'],
+    install_requires=['hsutil3k>=1.0.1', 'py>=1.3.2'],
     url='http://hg.hardcoded.net/hsaudiotag/',
     license='BSD License',
     description='Read metdata (tags) of mp3, mp4, wma, ogg, flac and aiff files.',
-    long_description=open('README').read(),
+    long_description=LONG_DESC,
     classifiers=CLASSIFIERS,
 )
