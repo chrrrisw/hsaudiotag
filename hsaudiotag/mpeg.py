@@ -135,7 +135,7 @@ class XingHeader(object):
         self.valid = data[:4] == b'Xing'
         self.frames = unpack('!I', data[8:12])[0]
         self.size = unpack('!I', data[12:16])[0]
-        self.scale = unpack('B', data[119])[0]
+        self.scale = data[119]
     
 class FhgHeader(object):
     def __init__(self, data):

@@ -171,6 +171,12 @@ class TCMpeg(TestCase):
         self.assertEqual(m.bitrate,221)
         self.assertEqual(m.duration,194)
     
+    def test_vbr_xing(self):
+        m = mpeg.Mpeg(expand_mpeg(self.filepath('mpeg/vbr_xing.mp3')))
+        self.assert_(m.vbr)
+        self.assertEqual(m.bitrate,211)
+        self.assertEqual(m.duration,193)
+    
     def test_tell_returns_None(self):
         #See TCFrameBrowser test with the same name for comments
         fp = io.BytesIO(b'')
