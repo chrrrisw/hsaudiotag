@@ -6,8 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-
-
 import io
 import struct
 import re
@@ -104,9 +102,8 @@ class FrameDataText(object):
     def __init__(self, fp):
         self.text = ''
         stringtype = fp.read(1)[0]
-        if stringtype not in STRING_ENCODINGS:
-            raise ValueError('%d is not a valid string type' % stringtype)
-        self.text = _read_id3_string(fp.read(), stringtype)
+        if stringtype in STRING_ENCODINGS:
+            self.text = _read_id3_string(fp.read(), stringtype)
     
     @staticmethod
     def supports(frameid):
@@ -118,11 +115,10 @@ class FrameDataComment(object):
         self._text = ('', '')
         stringtype = fp.read(1)[0]
         language = fp.read(3)
-        if stringtype not in STRING_ENCODINGS:
-            raise ValueError('%d is not a valid string type' % stringtype)
-        text = fp.read()
-        text = _read_id3_string(text, stringtype, '\0')
-        self._text = tuple(text.split('\0'))
+        if stringtype in STRING_ENCODINGS:
+            text = fp.read()
+            text = _read_id3_string(text, stringtype, '\0')
+            self._text = tuple(text.split('\0'))
     
     @staticmethod
     def supports(frameid):

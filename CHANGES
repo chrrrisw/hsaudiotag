@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 1.0.2 -- 2010/09/25
+---------------------------
+
+* Fixed a crash when reading Id3v2 text frames with invalid string encoding flag.
+
 Version 1.0.1 -- 2010/08/24
 ---------------------------
 

@@ -168,6 +168,18 @@ Enjoy your copy of MusicMatch Jukebox!"""
         # machine.
         self.assertEqual('foobar', _read_id3_string('foobar'.encode('utf-16le'), 1))
     
+    def test_invalid_text_ype(self):
+        # invalid_text_type has a 0xff stringtype
+        # Don't crash on invalid string types, just ignore the text
+        tag = Id3v2(self.filepath('id3v2/invalid_text_type.tag')) # don't crash
+        self.assertEqual(tag.frames['TXXX'].data.text, '') # ignore text
+    
+    def test_invalid_comment_type(self):
+        # invalid_comment_type has a 0xff stringtype
+        # Don't crash on invalid string types, just ignore the text
+        tag = Id3v2(self.filepath('id3v2/invalid_comment_type.tag')) # don't crash
+        self.assertEqual(tag.frames['COMM'].data.text, '') # ignore text
+    
 
 class TCHeader(TestCase):
     def test_main(self):
