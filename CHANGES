@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 1.0.3 -- 2010/11/11
+---------------------------
+
+* Fixed a crash when reading mp4 files with out of range genre indexes.
+
 Version 1.0.2 -- 2010/09/25
 ---------------------------
 
