@@ -551,5 +551,14 @@ class TCMp4File_non_ascii_genre(TestCase):
         self.assertEqual('\xe9', self.file.genre)
     
 
+class TCMp4File_genre_index_out_of_range(TestCase):
+    # Don't crash when a file has a numerical genre that is out of range
+    def setUp(self):
+        self.file = mp4.File(self.filepath('mp4/genre_index_out_of_range.m4a'))
+    
+    def test_genre(self):
+        self.assertEqual('', self.file.genre)
+    
+
 if __name__ == "__main__":
     unittest.main()

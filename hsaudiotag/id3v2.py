@@ -13,7 +13,7 @@ import re
 from hsutil.misc import cond, tryint
 from hsutil.files import FileOrPath
 
-from .genres import MUSIC_GENRES
+from .genres import genre_by_index
 
 ID_ID3 = b'ID3'
 ID_3DI = b'3DI'
@@ -292,10 +292,7 @@ class Id3v2(object):
         match = re_numeric_genre.match(genre)
         if match:
             index = int(match.group(1))
-            try:
-                return MUSIC_GENRES[index]
-            except IndexError:
-                return genre
+            return genre_by_index(index)
         else:
             return genre
     

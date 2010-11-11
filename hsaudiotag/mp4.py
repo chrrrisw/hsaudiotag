@@ -14,7 +14,7 @@ import struct
 from hsutil.files import open_if_filename
 from hsutil.misc import tryint
 
-from .genres import MUSIC_GENRES
+from .genres import genre_by_index
 
 HEADER_SIZE = 8
 
@@ -300,7 +300,7 @@ class File(AtomBox):
         if isinstance(data, str):
             return data
         elif isinstance(data, int):
-            return MUSIC_GENRES[data - 1]
+            return genre_by_index(data - 1)
         else:
             return ''
     

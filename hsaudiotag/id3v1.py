@@ -9,7 +9,7 @@
 import struct
 
 from hsutil.files import FileOrPath
-from .genres import MUSIC_GENRES
+from .genres import genre_by_index
 
 TAG_VERSION_1_0 = 1
 TAG_VERSION_1_1 = 2
@@ -76,7 +76,7 @@ class Id3v1(object):
         self.album = _arrange_id3_field(data[63:93])
         self.year = _arrange_id3_field(data[93:97])
         genre = data[127]
-        self.genre = MUSIC_GENRES[genre] if genre < len(MUSIC_GENRES) else ''
+        self.genre = genre_by_index(genre)
         self.size = 128
     
     @property
