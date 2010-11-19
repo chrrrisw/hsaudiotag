@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 1.0.4 -- 2010/11/19
+---------------------------
+
+* Fixed a crash when reading mp4 files with malformed attribute atoms.
+
 Version 1.0.3 -- 2010/11/11
 ---------------------------
 
