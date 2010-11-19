@@ -6,8 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-
-
 import re
 import struct
 
@@ -18,7 +16,7 @@ from .genres import genre_by_index
 
 HEADER_SIZE = 8
 
-re_atom_type = re.compile(r'[A-Za-z0-9\-\xa9]{4}')
+re_atom_type = re.compile(r'[A-Za-z0-9\-©]{4}')
 
 def read_atom_header(readfunc, offset):
     header = readfunc(offset, HEADER_SIZE)
@@ -35,7 +33,7 @@ def is_valid_atom_type(atom_type):
 
 # Base atom classes *****************************************
 
-class Atom(object):
+class Atom:
     cls_data_model = ''
     
     def __init__(self, parent, start_offset, header=None):
@@ -144,7 +142,11 @@ class AttributeAtom(AtomBox):
     
     @property
     def attr_data(self):
-        return self.atoms[0].attr_data
+        try:
+            return self.atoms[0].attr_data
+        except IndexError:
+            # For some reason, our attribute atom has no data sub-atom, no biggie, just return nothing.
+            return ''
     
 
 class AttributeDataAtom(Atom):
@@ -213,14 +215,14 @@ class StsdAtom(AtomBox):
     
 
 ATOM_SPECS = {
-    '\xa9nam': AttributeAtom,
-    '\xa9ART': AttributeAtom,
-    '\xa9wrt': AttributeAtom,
-    '\xa9alb': AttributeAtom,
-    '\xa9too': AttributeAtom,
-    '\xa9day': AttributeAtom,
-    '\xa9cmt': AttributeAtom,
-    '\xa9gen': AttributeAtom,
+    '©nam': AttributeAtom,
+    '©ART': AttributeAtom,
+    '©wrt': AttributeAtom,
+    '©alb': AttributeAtom,
+    '©too': AttributeAtom,
+    '©day': AttributeAtom,
+    '©cmt': AttributeAtom,
+    '©gen': AttributeAtom,
     'data': AttributeDataAtom,
     'esds': EsdsAtom,
     'gnre': GnreAtom,
@@ -262,11 +264,11 @@ class File(AtomBox):
     
     @property
     def album(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9alb')
+        return self._get_attr('moov.udta.meta.ilst.©alb')
     
     @property
     def artist(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9ART')
+        return self._get_attr('moov.udta.meta.ilst.©ART')
     
     @property
     def audio_offset(self):
@@ -285,7 +287,7 @@ class File(AtomBox):
     
     @property
     def comment(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9cmt')
+        return self._get_attr('moov.udta.meta.ilst.©cmt')
     
     @property
     def duration(self):
@@ -296,7 +298,7 @@ class File(AtomBox):
     def genre(self):
         data = self._get_attr('moov.udta.meta.ilst.gnre')
         if not data:
-            data = self._get_attr('moov.udta.meta.ilst.\xa9gen')
+            data = self._get_attr('moov.udta.meta.ilst.©gen')
         if isinstance(data, str):
             return data
         elif isinstance(data, int):
@@ -311,7 +313,7 @@ class File(AtomBox):
     
     @property
     def title(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9nam')
+        return self._get_attr('moov.udta.meta.ilst.©nam')
     
     @property
     def track(self):
@@ -323,5 +325,5 @@ class File(AtomBox):
     
     @property
     def year(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9day')[:4]
+        return self._get_attr('moov.udta.meta.ilst.©day')[:4]
     

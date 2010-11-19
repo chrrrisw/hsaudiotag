@@ -7,9 +7,16 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from hsutil.testcase import TestCase as TestCaseBase
+from hsutil.testutil import TestData as TestDataBase
 from hsutil.path import Path
 
 class TestCase(TestCaseBase):
+    @classmethod
+    def datadirpath(cls):
+        return Path(__file__)[:-1] + 'testdata'
+    
+
+class TestData(TestDataBase):
     @classmethod
     def datadirpath(cls):
         return Path(__file__)[:-1] + 'testdata'

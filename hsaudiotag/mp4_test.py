@@ -9,9 +9,11 @@
 import unittest
 import io
 
+from hsutil.testutil import eq_
+
 from . import mp4
 from .squeeze import expand_mp4
-from .testcase import TestCase
+from .testcase import TestCase, TestData
 
 class StubReader(io.BytesIO):
     """This class is to allow myself to remove the .seek .read code from mp4.Atom
@@ -543,22 +545,17 @@ class TCMp4Filetest7(TestCase):
         self.assertEqual(0,self.file.bitrate)
         self.assertEqual(60,self.file.duration)
 
-class TCMp4File_non_ascii_genre(TestCase):
-    def setUp(self):
-        self.file = mp4.File(self.filepath('mp4/non_ascii_genre.m4a'))
+def test_non_ascii_genre():
+    fp = mp4.File(TestData.filepath('mp4/non_ascii_genre.m4a'))
+    eq_(fp.genre, '\xe9')
 
-    def test_genre(self):
-        self.assertEqual('\xe9', self.file.genre)
-    
-
-class TCMp4File_genre_index_out_of_range(TestCase):
+def test_genre_index_out_of_range():
     # Don't crash when a file has a numerical genre that is out of range
-    def setUp(self):
-        self.file = mp4.File(self.filepath('mp4/genre_index_out_of_range.m4a'))
-    
-    def test_genre(self):
-        self.assertEqual('', self.file.genre)
-    
+    fp = mp4.File(TestData.filepath('mp4/genre_index_out_of_range.m4a'))
+    eq_(fp.genre, '') # don't crash
 
-if __name__ == "__main__":
-    unittest.main()
+def test_empty_attribute_atom():
+    # Don't crash when an AttributeAtom has no data (rare, but can happen).
+    # empty_attribute_atom.m4a has its title atom with no sub node.
+    fp = mp4.File(TestData.filepath('mp4/empty_attribute_atom.m4a'))
+    eq_(fp.title, '') # don't crash
