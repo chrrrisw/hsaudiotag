@@ -119,6 +119,9 @@ class AtomBox(Atom):
     #--- Public
     def find(self, atom_type):
         gotta_find = atom_type[:4]
+        # You'd think that iterating through atoms is slow and that there should be a {type:atom}
+        # mapping, but the tests I've done on real data shows that doing so is in fact slower.
+        # I think this is because most atoms have only a few subatoms.
         for atom in self.atoms:
             if atom.type == gotta_find:
                 if len(atom_type) >= 9:
