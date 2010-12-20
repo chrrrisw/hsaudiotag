@@ -10,7 +10,7 @@ import io
 
 from .. import mp4
 from .squeeze import expand_mp4
-from .testcase import TestCase, TestData, eq_
+from .util import TestData, eq_
 
 class StubReader(io.BytesIO):
     """This class is to allow myself to remove the .seek .read code from mp4.Atom
@@ -20,7 +20,7 @@ class StubReader(io.BytesIO):
         self.seek(startat)
         return io.BytesIO.read(self, readcount)
 
-class TCMp4Atom(TestCase):
+class TestMp4Atom:
     """Test mp4.Atom class.
 
     The goal of this testcase is to test mp4.Atom with all kind
@@ -123,7 +123,7 @@ class TCMp4Atom(TestCase):
         eq_(atom.data[2],b'aybabtu  ')
 
 
-class TCMp4AtomBox(TestCase):
+class TestMp4AtomBox:
     """Test mp4.AtomBox class.
 
     The goal of this testcase is to test mp4.Atom with all kind
@@ -159,11 +159,11 @@ class TCMp4AtomBox(TestCase):
         eq_(atom.data[2],b'sub1')
         eq_(atom.atoms[0].type,'sub2')
 
-class TCMp4FileTest1(TestCase):
-    def setUp(self):
+class TestMp4FileTest1:
+    def setup_method(self, method):
         self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test1.m4a')))
 
-    def tearDown(self):
+    def teardown_method(self, method):
         if hasattr(self,'file'):
             self.file.close()
 
@@ -411,8 +411,8 @@ class TCMp4FileTest1(TestCase):
         #Just make sure that no exception is going through. It is normal that
         #all the fields are blank
         del self.file
-        fp = open(TestData.filepath('mp4/test1.m4a'),'r+b')
-        file = mp4.File(TestData.filepath('mp4/test1.m4a'))
+        open(TestData.filepath('mp4/test1.m4a'),'r+b') # no crash
+        mp4.File(TestData.filepath('mp4/test1.m4a')) # no crash
 
     def test_size(self):
         #mdat offset
@@ -421,8 +421,8 @@ class TCMp4FileTest1(TestCase):
         eq_(0x3357ad - 0xc820,self.file.audio_size)
 
 
-class TCMp4Filezerofile(TestCase):
-    def setUp(self):
+class TestMp4Filezerofile:
+    def setup_method(self, method):
         self.file = mp4.File(TestData.filepath('zerofile'))
 
     def test_find(self):
@@ -446,16 +446,16 @@ class TCMp4Filezerofile(TestCase):
     def test_atoms(self):
         eq_(0,len(self.file.atoms));
 
-class TCMp4Filerandomfile(TCMp4Filezerofile):
-    def setUp(self):
+class TestMp4Filerandomfile(TestMp4Filezerofile):
+    def setup_method(self, method):
         self.file = mp4.File(TestData.filepath('randomfile'))
 
-class TCMp4Filezerofill(TCMp4Filezerofile):
-    def setUp(self):
+class TestMp4Filezerofill(TestMp4Filezerofile):
+    def setup_method(self, method):
         self.file = mp4.File(TestData.filepath('zerofill'))
 
-class TCMp4Fileinvalid1(TestCase):
-    def setUp(self):
+class TestMp4Fileinvalid1:
+    def setup_method(self, method):
         self.file = mp4.File(TestData.filepath('mp4/invalid1.m4a'))
 
     def test_find(self):
@@ -467,80 +467,60 @@ class TCMp4Fileinvalid1(TestCase):
     def test_track_is_int(self):
         eq_(0,self.file.track)
 
-class TCMp4Filetest2(TestCase):
-    def setUp(self):
-        self.file = mp4.File(TestData.filepath('mp4/test2.m4a'))
+def test_file_test2():
+    f = mp4.File(TestData.filepath('mp4/test2.m4a'))
+    eq_('Intro to Where It\'s At',f.title)
+    eq_('Beck',f.artist)
+    eq_('Odelay',f.album)
+    eq_('Alternative',f.genre)
+    eq_('This is a test',f.comment)
+    eq_(754518,f.size)
+    eq_(44100,f.sample_rate)
+    eq_(11,f.duration)
+    eq_(128,f.bitrate)
 
-    def test_info(self):
-        eq_('Intro to Where It\'s At',self.file.title)
-        eq_('Beck',self.file.artist)
-        eq_('Odelay',self.file.album)
-        eq_('Alternative',self.file.genre)
-        eq_('This is a test',self.file.comment)
-        eq_(754518,self.file.size)
-        eq_(44100,self.file.sample_rate)
-        eq_(11,self.file.duration)
-        eq_(128,self.file.bitrate)
+def test_file_test3():
+    f = mp4.File(expand_mp4(TestData.filepath('mp4/test3.m4a')))
+    assert isinstance(f.title,str)
+    assert isinstance(f.artist,str)
+    assert isinstance(f.title,str)
+    eq_('J\'ai oubli\u00e9',f.title)
+    assert isinstance(f.artist,str)
+    eq_('Capitaine R\u00e9volte',f.artist)
+    eq_('Danse sociale',f.album)
+    eq_('Punk',f.genre)
+    eq_('',f.comment)
+    eq_(3813888,f.size)
+    eq_(44100,f.sample_rate)
+    eq_(235,f.duration)
+    eq_(128,f.bitrate)
 
-class TCMp4Filetest3(TestCase):
-    def setUp(self):
-        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test3.m4a')))
+def test_file_test4():
+    f = mp4.File(expand_mp4(TestData.filepath('mp4/test4.m4a')))
+    eq_('2005', f.year)
 
-    def test_info(self):
-        assert isinstance(self.file.title,str)
-        assert isinstance(self.file.artist,str)
-        assert isinstance(self.file.title,str)
-        eq_('J\'ai oubli\u00e9',self.file.title)
-        assert isinstance(self.file.artist,str)
-        eq_('Capitaine R\u00e9volte',self.file.artist)
-        eq_('Danse sociale',self.file.album)
-        eq_('Punk',self.file.genre)
-        eq_('',self.file.comment)
-        eq_(3813888,self.file.size)
-        eq_(44100,self.file.sample_rate)
-        eq_(235,self.file.duration)
-        eq_(128,self.file.bitrate)
+def test_file_test5():
+    f = mp4.File(expand_mp4(TestData.filepath('mp4/test5.m4a')))
+    eq_('Hip Hop/Rap', f.genre)
+    eq_(128, f.bitrate)
 
-class TCMp4Filetest4(TestCase):
-    def setUp(self):
-        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test4.m4a')))
+def test_file_test6():
+    # The type of this file in stsd is drms, which isn't present in th emp4 layout doc.
+    # the drms type also has 44 bytes before sub boxes.
+    f = mp4.File(expand_mp4(TestData.filepath('mp4/test6.m4p')))
+    eq_(128, f.bitrate)
+    eq_(0x7b00b, f.audio_offset)
+    eq_(0x279d23, f.audio_size)
 
-    def test_info(self):
-        eq_('2005',self.file.year)
-
-class TCMp4Filetest5(TestCase):
-    def setUp(self):
-        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test5.m4a')))
-
-    def test_info(self):
-        eq_('Hip Hop/Rap',self.file.genre)
-        eq_(128,self.file.bitrate)
-
-class TCMp4Filetest6(TestCase):
-    def setUp(self):
-        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test6.m4p')))
-
-    def test_info(self):
-        """The type of this file in stsd is drms, which isn't present in th emp4 layout doc.
-        the drms type also has 44 bytes before sub boxes.
-        """
-        eq_(128,self.file.bitrate)
-        eq_(0x7b00b,self.file.audio_offset)
-        eq_(0x279d23,self.file.audio_size)
-
-class TCMp4Filetest7(TestCase):
-    def setUp(self):
-        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test7.m4a')))
-
-    def test_info(self):
-        """This file is a lossless aac file.
-        """
-        eq_('Coolio',self.file.artist)
-        eq_('That\'s How It Is',self.file.title)
-        eq_('Gangsta\'s Paradise',self.file.album)
-        eq_('Hip Hop/Rap',self.file.genre)
-        eq_(0,self.file.bitrate)
-        eq_(60,self.file.duration)
+def test_file_test7():
+    # This file is a lossless aac file.
+    f = mp4.File(expand_mp4(TestData.filepath('mp4/test7.m4a')))
+    eq_('Coolio', f.artist)
+    eq_('That\'s How It Is', f.title)
+    eq_('Gangsta\'s Paradise', f.album)
+    eq_('Hip Hop/Rap', f.genre)
+    eq_(0, f.bitrate)
+    eq_(60, f.duration)
 
 def test_non_ascii_genre():
     fp = mp4.File(TestData.filepath('mp4/non_ascii_genre.m4a'))

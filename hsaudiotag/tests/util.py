@@ -6,7 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from hsutil.testcase import TestCase
 from hsutil.testutil import TestData as TestDataBase, eq_
 from hsutil.path import Path
 
