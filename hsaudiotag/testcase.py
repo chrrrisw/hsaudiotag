@@ -7,7 +7,7 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from hsutil.testcase import TestCase as TestCaseBase
-from hsutil.testutil import TestData as TestDataBase
+from hsutil.testutil import TestData as TestDataBase, eq_
 from hsutil.path import Path
 
 class TestCase(TestCaseBase):

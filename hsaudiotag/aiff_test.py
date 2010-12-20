@@ -7,29 +7,29 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from . import aiff
-from .testcase import TestCase
+from .testcase import TestCase, eq_
 
 class AiffFile(TestCase):
     def test_random(self):
         # a random file is not valid
         f = aiff.File(self.filepath('randomfile'))
-        self.assertFalse(f.valid)
+        assert not f.valid
     
     def test_long_comm_field(self):
         # some COMM fields are longer than 18 bytes. They must be supported
         f = aiff.File(self.filepath('aiff/long_comm_field.aif'))
-        self.assertTrue(f.valid)
-        self.assertEqual(f.duration, 132)
+        assert f.valid
+        eq_(f.duration, 132)
     
     def test_with_id3(self):
         # this file is a track encoded from a CD with iTunes. It has a ID3 chunk. The SSND chunk
         # has been manually truncated (the file was 22mb)
         f = aiff.File(self.filepath('aiff/with_id3.aif'))
-        self.assertTrue(f.valid)
-        self.assertEqual(f.duration, 132)
-        self.assertEqual(f.sample_rate, 44100)
-        self.assertEqual(f.bitrate, 1411200)
-        self.assertEqual(f.tag.artist, 'Assimil') # The id3v2 module takes care of it, no need to test it further
-        self.assertEqual(f.audio_offset, 46)
-        self.assertEqual(f.audio_size, 42)
+        assert f.valid
+        eq_(f.duration, 132)
+        eq_(f.sample_rate, 44100)
+        eq_(f.bitrate, 1411200)
+        eq_(f.tag.artist, 'Assimil') # The id3v2 module takes care of it, no need to test it further
+        eq_(f.audio_offset, 46)
+        eq_(f.audio_size, 42)
     

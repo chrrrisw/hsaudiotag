@@ -7,33 +7,33 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from .id3v1 import *
-from .testcase import TestCase
+from .testcase import TestCase, eq_
 
 class TCId3v1(TestCase):
     def _do_test(self, filename, expected):
         tag = Id3v1(self.filepath('id3v1/{0}'.format(filename)))
-        self.assertEqual(tag.version, expected[0])
-        self.assertEqual(tag.track, expected[1])
-        self.assertEqual(tag.title, expected[2])
-        self.assertEqual(tag.artist, expected[3])
-        self.assertEqual(tag.album, expected[4])
-        self.assertEqual(tag.year, expected[5])
-        self.assertEqual(tag.genre, expected[6])
-        self.assertEqual(tag.comment, expected[7])
+        eq_(tag.version, expected[0])
+        eq_(tag.track, expected[1])
+        eq_(tag.title, expected[2])
+        eq_(tag.artist, expected[3])
+        eq_(tag.album, expected[4])
+        eq_(tag.year, expected[5])
+        eq_(tag.genre, expected[6])
+        eq_(tag.comment, expected[7])
     
     def _do_test_empty_tag(self, tagdata):
         self.failIf(tagdata.exists)
-        self.assertEqual(tagdata.version, 0)
-        self.assertEqual(tagdata.size, 0)
-        self.assertEqual(tagdata.artist, '')
-        self.assertEqual(tagdata.album, '')
-        self.assertEqual(tagdata.year, '')
-        self.assertEqual(tagdata.genre, '')
-        self.assertEqual(tagdata.comment, '')
-        self.assertEqual(tagdata.track, 0)
+        eq_(tagdata.version, 0)
+        eq_(tagdata.size, 0)
+        eq_(tagdata.artist, '')
+        eq_(tagdata.album, '')
+        eq_(tagdata.year, '')
+        eq_(tagdata.genre, '')
+        eq_(tagdata.comment, '')
+        eq_(tagdata.track, 0)
     
     def _do_fail(self, as_filename):
-        self.assertFalse(Id3v1(self.filepath('id3v1/{0}'.format(as_filename))).exists)
+        assert not Id3v1(self.filepath('id3v1/{0}'.format(as_filename))).exists
     
     def test001(self):
         testdata = (TAG_VERSION_1_0, 0, "Title", "Artist", "Album", "2003", "Hip-Hop", "Comment")
@@ -100,15 +100,15 @@ class TCId3v1(TestCase):
         for i in range(15, 95):
             filename = "id3v1_%03d_genre.mp3" % i
             tag = Id3v1(self.filepath('id3v1/{0}'.format(filename)))
-            self.assertEqual(tag.genre, tag.title)
+            eq_(tag.genre, tag.title)
         for i in range(95, 163):
             filename = "id3v1_%03d_genre_W.mp3" % i
             tag = Id3v1(self.filepath('id3v1/{0}'.format(filename)))
-            self.assertEqual(tag.genre, tag.title)
+            eq_(tag.genre, tag.title)
         for i in range(163, 271):
             filename = "id3v1_%03d_genre_F.mp3" % i
             tag = Id3v1(self.filepath('id3v1/{0}'.format(filename)))
-            self.assertEqual(tag.genre, "")
+            eq_(tag.genre, "")
     
     def testzero(self):
         #test that id3v1 handle invalid files gracefully
@@ -117,14 +117,14 @@ class TCId3v1(TestCase):
     
     def test_non_ascii(self):
         tag = Id3v1(self.filepath('id3v1/id3v1_non_ascii.mp3'))
-        self.assert_(isinstance(tag.title, str))
-        self.assertEqual('Title\u00c8', tag.title)
+        assert isinstance(tag.title, str)
+        eq_('Title\u00c8', tag.title)
     
     def test_newlines_and_return_carriage(self):
         tag = Id3v1(self.filepath('id3v1/id3v1_newlines.mp3'))
-        self.assertEqual('foo bar baz', tag.title)
-        self.assertEqual('foo bar baz', tag.artist)
-        self.assertEqual('foo bar baz', tag.album)
-        self.assertEqual('foo bar baz', tag.comment)
-        self.assertEqual('2  3', tag.year)
+        eq_('foo bar baz', tag.title)
+        eq_('foo bar baz', tag.artist)
+        eq_('foo bar baz', tag.album)
+        eq_('foo bar baz', tag.comment)
+        eq_('2  3', tag.year)
     
