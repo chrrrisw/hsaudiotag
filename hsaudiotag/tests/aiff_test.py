@@ -7,24 +7,24 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from .. import aiff
-from .testcase import TestCase, eq_
+from .testcase import TestCase, TestData, eq_
 
 class AiffFile(TestCase):
     def test_random(self):
         # a random file is not valid
-        f = aiff.File(self.filepath('randomfile'))
+        f = aiff.File(TestData.filepath('randomfile'))
         assert not f.valid
     
     def test_long_comm_field(self):
         # some COMM fields are longer than 18 bytes. They must be supported
-        f = aiff.File(self.filepath('aiff/long_comm_field.aif'))
+        f = aiff.File(TestData.filepath('aiff/long_comm_field.aif'))
         assert f.valid
         eq_(f.duration, 132)
     
     def test_with_id3(self):
         # this file is a track encoded from a CD with iTunes. It has a ID3 chunk. The SSND chunk
         # has been manually truncated (the file was 22mb)
-        f = aiff.File(self.filepath('aiff/with_id3.aif'))
+        f = aiff.File(TestData.filepath('aiff/with_id3.aif'))
         assert f.valid
         eq_(f.duration, 132)
         eq_(f.sample_rate, 44100)

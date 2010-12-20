@@ -6,15 +6,9 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from hsutil.testcase import TestCase as TestCaseBase
+from hsutil.testcase import TestCase
 from hsutil.testutil import TestData as TestDataBase, eq_
 from hsutil.path import Path
-
-class TestCase(TestCaseBase):
-    @classmethod
-    def datadirpath(cls):
-        return Path(__file__)[:-1] + 'testdata'
-    
 
 class TestData(TestDataBase):
     @classmethod

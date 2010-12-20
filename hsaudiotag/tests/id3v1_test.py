@@ -7,11 +7,11 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from ..id3v1 import *
-from .testcase import TestCase, eq_
+from .testcase import TestCase, TestData, eq_
 
 class TCId3v1(TestCase):
     def _do_test(self, filename, expected):
-        tag = Id3v1(self.filepath('id3v1/{0}'.format(filename)))
+        tag = Id3v1(TestData.filepath('id3v1/{0}'.format(filename)))
         eq_(tag.version, expected[0])
         eq_(tag.track, expected[1])
         eq_(tag.title, expected[2])
@@ -33,7 +33,7 @@ class TCId3v1(TestCase):
         eq_(tagdata.track, 0)
     
     def _do_fail(self, as_filename):
-        assert not Id3v1(self.filepath('id3v1/{0}'.format(as_filename))).exists
+        assert not Id3v1(TestData.filepath('id3v1/{0}'.format(as_filename))).exists
     
     def test001(self):
         testdata = (TAG_VERSION_1_0, 0, "Title", "Artist", "Album", "2003", "Hip-Hop", "Comment")
@@ -99,29 +99,29 @@ class TCId3v1(TestCase):
     def testgenres(self):
         for i in range(15, 95):
             filename = "id3v1_%03d_genre.mp3" % i
-            tag = Id3v1(self.filepath('id3v1/{0}'.format(filename)))
+            tag = Id3v1(TestData.filepath('id3v1/{0}'.format(filename)))
             eq_(tag.genre, tag.title)
         for i in range(95, 163):
             filename = "id3v1_%03d_genre_W.mp3" % i
-            tag = Id3v1(self.filepath('id3v1/{0}'.format(filename)))
+            tag = Id3v1(TestData.filepath('id3v1/{0}'.format(filename)))
             eq_(tag.genre, tag.title)
         for i in range(163, 271):
             filename = "id3v1_%03d_genre_F.mp3" % i
-            tag = Id3v1(self.filepath('id3v1/{0}'.format(filename)))
+            tag = Id3v1(TestData.filepath('id3v1/{0}'.format(filename)))
             eq_(tag.genre, "")
     
     def testzero(self):
         #test that id3v1 handle invalid files gracefully
-        self._do_test_empty_tag(Id3v1(self.filepath('zerofile')))
-        self._do_test_empty_tag(Id3v1(self.filepath('randomfile')))
+        self._do_test_empty_tag(Id3v1(TestData.filepath('zerofile')))
+        self._do_test_empty_tag(Id3v1(TestData.filepath('randomfile')))
     
     def test_non_ascii(self):
-        tag = Id3v1(self.filepath('id3v1/id3v1_non_ascii.mp3'))
+        tag = Id3v1(TestData.filepath('id3v1/id3v1_non_ascii.mp3'))
         assert isinstance(tag.title, str)
         eq_('Title\u00c8', tag.title)
     
     def test_newlines_and_return_carriage(self):
-        tag = Id3v1(self.filepath('id3v1/id3v1_newlines.mp3'))
+        tag = Id3v1(TestData.filepath('id3v1/id3v1_newlines.mp3'))
         eq_('foo bar baz', tag.title)
         eq_('foo bar baz', tag.artist)
         eq_('foo bar baz', tag.album)

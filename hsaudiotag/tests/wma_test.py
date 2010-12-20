@@ -7,12 +7,12 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from .. import wma
-from .testcase import TestCase, eq_
+from .testcase import TestCase, TestData, eq_
 
 class TCWma(TestCase):
     def test1(self):
         # test1.wma is a normal, valid wma file
-        w = wma.WMADecoder(self.filepath('wma/test1.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test1.wma'))
         eq_(w.artist, 'Modest Mouse')
         eq_(w.album, 'The Moon & Antarctica')
         eq_(w.title, '3rd Planet')
@@ -29,29 +29,29 @@ class TCWma(TestCase):
 
     def test2(self):
         # test2.wma is a mpeg file, thus invalid
-        w = wma.WMADecoder(self.filepath('wma/test2.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test2.wma'))
         assert not w.valid
         eq_(w.audio_offset, 0)
         eq_(w.audio_size, 0)
 
     def testZeroFile(self):
-        w = wma.WMADecoder(self.filepath('zerofile'))
+        w = wma.WMADecoder(TestData.filepath('zerofile'))
         assert not w.valid
     
     def test1_non_ascii(self):
         # The album is Unicode
-        w = wma.WMADecoder(self.filepath('wma/test1_non_ascii.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test1_non_ascii.wma'))
         assert isinstance(w.album, str)
         eq_(w.album, 'The Moon \u00c8 Antarctica')
     
     def test1_no_track(self):
         # This is a file with no WM/TRACK field
-        w = wma.WMADecoder(self.filepath('wma/test1_no_track.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test1_no_track.wma'))
         eq_(0, w.track)
         
     def test3(self):
         # This is the file that made a customer's musicGuru copy bug. It was because it has no track.
-        w = wma.WMADecoder(self.filepath('wma/test3.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test3.wma'))
         eq_(w.artist, 'Giovanni Marradi')
         eq_(w.album, 'Always')
         eq_(w.title, 'Gideon')
@@ -67,27 +67,27 @@ class TCWma(TestCase):
     def test3_truncated_unicode(self):
         # This is the file has its WM/GENRE field last char truncated. Its value, 'Easy Listening' 
         # also has one char truncated. 'Gideon' in the unnamed fields part also has one truncated char.
-        w = wma.WMADecoder(self.filepath('wma/test3_truncated_unicode.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test3_truncated_unicode.wma'))
         eq_(w.genre, 'Easy Listening')
         eq_(w.title, 'Gideon')
         
     def test3_invalid_unicode_surregate(self):
         # This is the file has an invalid char (0xffff) in its WM/GENRE field. 'Gideon' in the 
         # unnamed fields part also has an invalid surregate (0xdbff and another 0xdbff).
-        w = wma.WMADecoder(self.filepath('wma/test3_invalid_unicode_surregate.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test3_invalid_unicode_surregate.wma'))
         eq_(w.genre, '')
         eq_(w.title, '')
         
     def test3_incomplete(self):
         # This file is truncated right in the middle of a field header. The error that it made was an
         # unpack error.
-        w = wma.WMADecoder(self.filepath('wma/test3_incomplete.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test3_incomplete.wma'))
         eq_(w.genre, '')
         eq_(w.title, '')
         
     def test4(self):
         # VBR
-        w = wma.WMADecoder(self.filepath('wma/test4.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test4.wma'))
         eq_(w.artist, 'Red Hot Chilly Peppers')
         eq_(w.album, '')
         eq_(w.title, 'Scar Tissue')
@@ -102,19 +102,19 @@ class TCWma(TestCase):
     
     def test5(self):
         # Another VBR
-        w = wma.WMADecoder(self.filepath('wma/test5.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test5.wma'))
         eq_(w.bitrate, 303)
         eq_(w.duration, 295)
         
     def test6(self):
         # Another VBR. This one had a huge, 30 seconds, duration gap
-        w = wma.WMADecoder(self.filepath('wma/test6.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test6.wma'))
         eq_(w.bitrate, 422)
         eq_(w.duration, 298)
         
     def test7(self):
         # Yet another VBR wma with buggy duration.
-        w = wma.WMADecoder(self.filepath('wma/test7.wma'))
+        w = wma.WMADecoder(TestData.filepath('wma/test7.wma'))
         eq_(w.bitrate, 327)
         eq_(w.duration, 539)
     

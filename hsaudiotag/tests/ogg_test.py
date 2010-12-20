@@ -7,11 +7,11 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from .. import ogg
-from .testcase import TestCase, eq_
+from .testcase import TestCase, TestData, eq_
 
 class TCOggVorbisPage(TestCase):
     def test_valid_test1(self):
-        fp = open(self.filepath('ogg/test1.ogg'), 'rb')
+        fp = open(TestData.filepath('ogg/test1.ogg'), 'rb')
         page = ogg.VorbisPage(fp)
         assert page.valid
         eq_(0, page.page_number)
@@ -40,7 +40,7 @@ class TCOggVorbisPage(TestCase):
 
 class TCOggVorbis(TestCase):
     def test_valid_test1(self):
-        o = ogg.Vorbis(self.filepath('ogg/test1.ogg'))
+        o = ogg.Vorbis(TestData.filepath('ogg/test1.ogg'))
         eq_(101785, o.size)
         eq_(160, o.bitrate)
         eq_(44100, o.sample_rate)
@@ -57,7 +57,7 @@ class TCOggVorbis(TestCase):
         eq_(101785 - 0x1158, o.audio_size)
 
     def test_valid_test2(self):
-        o = ogg.Vorbis(self.filepath('ogg/test2.ogg'))
+        o = ogg.Vorbis(TestData.filepath('ogg/test2.ogg'))
         eq_(103168, o.size)
         eq_(199, o.bitrate)
         eq_(44100, o.sample_rate)
@@ -89,26 +89,26 @@ class TCOggVorbis(TestCase):
         eq_(0, o.audio_size)
 
     def test_invalid_zerofile(self):
-        o = ogg.Vorbis(self.filepath('zerofile'))
+        o = ogg.Vorbis(TestData.filepath('zerofile'))
         self.verify_emptyness(o)
 
     def test_invalid_zerofill(self):
-        o = ogg.Vorbis(self.filepath('zerofill'))
+        o = ogg.Vorbis(TestData.filepath('zerofill'))
         self.verify_emptyness(o)
 
     def test_invalid_randomfile(self):
-        o = ogg.Vorbis(self.filepath('randomfile'))
+        o = ogg.Vorbis(TestData.filepath('randomfile'))
         self.verify_emptyness(o)
 
     def test_invalid_mp3(self):
-        o = ogg.Vorbis(self.filepath('mpeg/test1.mp3'))
+        o = ogg.Vorbis(TestData.filepath('mpeg/test1.mp3'))
         self.verify_emptyness(o)
 
     def test_invalid_wma(self):
-        o = ogg.Vorbis(self.filepath('wma/test1.wma'))
+        o = ogg.Vorbis(TestData.filepath('wma/test1.wma'))
         self.verify_emptyness(o)
 
     def test_invalid_mp4(self):
-        o = ogg.Vorbis(self.filepath('mp4/test1.m4a'))
+        o = ogg.Vorbis(TestData.filepath('mp4/test1.m4a'))
         self.verify_emptyness(o)
     

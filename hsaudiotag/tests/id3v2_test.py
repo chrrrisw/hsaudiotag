@@ -8,11 +8,11 @@
 
 from ..id3v2 import Id3v2, Header, POS_END, _read_id3_string
 from .squeeze import expand_mpeg
-from .testcase import TestCase, eq_
+from .testcase import TestCase, TestData, eq_
 
 class TCId3v2(TestCase):
     def testNormal(self):
-        tag = Id3v2(expand_mpeg(self.filepath('id3v2/normal.mp3')))
+        tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/normal.mp3')))
         eq_(tag.size,4096)
         eq_(tag.data_size,4086)
         assert tag.exists
@@ -25,11 +25,11 @@ class TCId3v2(TestCase):
         eq_(tag.comment,'http://www.EliteMP3.ws')
     
     def testNotag(self):
-        tag = Id3v2(expand_mpeg(self.filepath('id3v2/notag.mp3')))
+        tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/notag.mp3')))
         assert not tag.exists
     
     def testThatspot(self):
-        tag = Id3v2(self.filepath('id3v2/thatspot.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/thatspot.tag'))
         expected_comment = """THAT SPOT RIGHT THERE (14 second demo clip)
 
 This 14 second demo clip was recorded at CD-Quality using the standard MusicMatch Jukebox
@@ -46,7 +46,7 @@ Enjoy your copy of MusicMatch Jukebox!"""
         eq_(tag.genre,'Blues')
     
     def testOzzy(self):
-        tag = Id3v2(self.filepath('id3v2/ozzy.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/ozzy.tag'))
         eq_(tag.title,'Bark At The Moon')
         eq_(tag.artist,'Ozzy Osbourne')
         eq_(tag.album,'Bark At The Moon')
@@ -56,55 +56,55 @@ Enjoy your copy of MusicMatch Jukebox!"""
         eq_(tag.track,1)
     
     def testUnicode(self):
-        tag = Id3v2(self.filepath('id3v2/230-unicode.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/230-unicode.tag'))
         eq_(tag.frames['TXXX'].data.text,'example text frame\nThis text and the description should be in Unicode.')
     
     def testWithFooter(self):
-        tag = Id3v2(expand_mpeg(self.filepath('id3v2/with_footer.mp3')))
+        tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/with_footer.mp3')))
         assert tag.exists
         eq_(tag.artist,'AFI')
         eq_(tag.position,POS_END)
     
     def testTrack(self):
-        tag = Id3v2(expand_mpeg(self.filepath('id3v2/test_track.mp3')))
+        tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/test_track.mp3')))
         eq_(tag.track,1)
     
     def testZeroFile(self):
-        tag = Id3v2(self.filepath('zerofile'))
+        tag = Id3v2(TestData.filepath('zerofile'))
         assert not tag.exists
     
     def test_non_ascii_non_unicode(self):
         #Test a v2 tag with non-ascii char in a non-unicode string
-        tag = Id3v2(self.filepath('id3v2/ozzy_non_ascii.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/ozzy_non_ascii.tag'))
         assert isinstance(tag.title,str)
         eq_(tag.title,'Bark At The \u00c8\u00c9\u00ca\u00cb')
     
     def test_numeric_genre(self):
         #A file with a genre field containing (<number>)
-        tag = Id3v2(self.filepath('id3v2/numeric_genre.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/numeric_genre.tag'))
         eq_('Metal',tag.genre)
     
     def test_numeric_genre2(self):
         #A file with a genre field containing (<number>)
-        tag = Id3v2(self.filepath('id3v2/numeric_genre2.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/numeric_genre2.tag'))
         eq_('Rock',tag.genre)
     
     def test_numeric_genre3(self):
         #like numeric_genre, but the number is not between ()
-        tag = Id3v2(self.filepath('id3v2/numeric_genre3.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/numeric_genre3.tag'))
         eq_('Rock',tag.genre)
     
     def test_unicode_truncated(self):
-        tag = Id3v2(self.filepath('id3v2/230-unicode_truncated.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/230-unicode_truncated.tag'))
         eq_(tag.frames['TXXX'].data.text,
             'example text frame\nThis text and the description should be in Unicode.')
     
     def test_unicode_invalid_surregate(self):
-        tag = Id3v2(self.filepath('id3v2/230-unicode_surregate.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/230-unicode_surregate.tag'))
         eq_(tag.frames['TXXX'].data.text,'')
     
     def test_unicode_comment(self):
-        tag = Id3v2(self.filepath('id3v2/230-unicode_comment.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/230-unicode_comment.tag'))
         eq_(tag.frames['COMM'].data.title,'example text frame')
         eq_(tag.frames['COMM'].data.text,
             'This text and the description should be in Unicode.')
@@ -112,11 +112,11 @@ Enjoy your copy of MusicMatch Jukebox!"""
             'This text and the description should be in Unicode.')
     
     def test_TLEN(self):
-        tag = Id3v2(self.filepath('mpeg/test8.mp3'))
+        tag = Id3v2(TestData.filepath('mpeg/test8.mp3'))
         eq_(tag.duration,299)
     
     def test_DecodeTrack(self):
-        tag = Id3v2(self.filepath('zerofile'))
+        tag = Id3v2(TestData.filepath('zerofile'))
         method = tag._decode_track
         eq_(42,method('42'))
         eq_(0,method(''))
@@ -126,7 +126,7 @@ Enjoy your copy of MusicMatch Jukebox!"""
         eq_(0,method('foo/12'))
     
     def test_Decodeduration(self):
-        tag = Id3v2(self.filepath('zerofile'))
+        tag = Id3v2(TestData.filepath('zerofile'))
         tag._get_frame_text = lambda _:'4200'
         eq_(4,tag.duration)
         tag._get_frame_text = lambda _:''
@@ -135,7 +135,7 @@ Enjoy your copy of MusicMatch Jukebox!"""
         eq_(0,tag.duration)
     
     def test_newlines(self):
-        tag = Id3v2(self.filepath('id3v2/newlines.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/newlines.tag'))
         eq_('foo bar baz',tag.title)
         eq_('foo bar baz',tag.artist)
         eq_('foo bar baz',tag.album)
@@ -144,7 +144,7 @@ Enjoy your copy of MusicMatch Jukebox!"""
         eq_('foo\nbar\rbaz',tag.comment)
     
     def test_version_22(self):
-        tag = Id3v2(self.filepath('id3v2/v22.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/v22.tag'))
         eq_('Chanson de Nuit - Op. 15 No. 1',tag.title)
         eq_('Kennedy / Pettinger',tag.artist)
         eq_('Salut d\'Amour (Elgar)',tag.album)
@@ -155,7 +155,7 @@ Enjoy your copy of MusicMatch Jukebox!"""
     
     def test_v24_no_syncsafe(self):
         #syncsafe is only for v2.4 and up.
-        tag = Id3v2(self.filepath('id3v2/v24_no_syncsafe.tag'))
+        tag = Id3v2(TestData.filepath('id3v2/v24_no_syncsafe.tag'))
         eq_('Boccherini / Minuet (String Quartet in E major)',tag.title)
     
     def test_stringtype_one_be_encoded_no_bom(self):
@@ -169,19 +169,19 @@ Enjoy your copy of MusicMatch Jukebox!"""
     def test_invalid_text_ype(self):
         # invalid_text_type has a 0xff stringtype
         # Don't crash on invalid string types, just ignore the text
-        tag = Id3v2(self.filepath('id3v2/invalid_text_type.tag')) # don't crash
+        tag = Id3v2(TestData.filepath('id3v2/invalid_text_type.tag')) # don't crash
         eq_(tag.frames['TXXX'].data.text, '') # ignore text
     
     def test_invalid_comment_type(self):
         # invalid_comment_type has a 0xff stringtype
         # Don't crash on invalid string types, just ignore the text
-        tag = Id3v2(self.filepath('id3v2/invalid_comment_type.tag')) # don't crash
+        tag = Id3v2(TestData.filepath('id3v2/invalid_comment_type.tag')) # don't crash
         eq_(tag.frames['COMM'].data.text, '') # ignore text
     
 
 class TCHeader(TestCase):
     def test_main(self):
-        fp = open(self.filepath('id3v2/230-unicode_comment.tag'),'rb')
+        fp = open(TestData.filepath('id3v2/230-unicode_comment.tag'),'rb')
         h = Header(fp)
         assert h.valid
         fp.close()

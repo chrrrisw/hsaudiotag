@@ -161,7 +161,7 @@ class TCMp4AtomBox(TestCase):
 
 class TCMp4FileTest1(TestCase):
     def setUp(self):
-        self.file = mp4.File(expand_mp4(self.filepath('mp4/test1.m4a')))
+        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test1.m4a')))
 
     def tearDown(self):
         if hasattr(self,'file'):
@@ -411,8 +411,8 @@ class TCMp4FileTest1(TestCase):
         #Just make sure that no exception is going through. It is normal that
         #all the fields are blank
         del self.file
-        fp = open(self.filepath('mp4/test1.m4a'),'r+b')
-        file = mp4.File(self.filepath('mp4/test1.m4a'))
+        fp = open(TestData.filepath('mp4/test1.m4a'),'r+b')
+        file = mp4.File(TestData.filepath('mp4/test1.m4a'))
 
     def test_size(self):
         #mdat offset
@@ -423,7 +423,7 @@ class TCMp4FileTest1(TestCase):
 
 class TCMp4Filezerofile(TestCase):
     def setUp(self):
-        self.file = mp4.File(self.filepath('zerofile'))
+        self.file = mp4.File(TestData.filepath('zerofile'))
 
     def test_find(self):
         eq_(None,self.file.find('moov'));
@@ -448,15 +448,15 @@ class TCMp4Filezerofile(TestCase):
 
 class TCMp4Filerandomfile(TCMp4Filezerofile):
     def setUp(self):
-        self.file = mp4.File(self.filepath('randomfile'))
+        self.file = mp4.File(TestData.filepath('randomfile'))
 
 class TCMp4Filezerofill(TCMp4Filezerofile):
     def setUp(self):
-        self.file = mp4.File(self.filepath('zerofill'))
+        self.file = mp4.File(TestData.filepath('zerofill'))
 
 class TCMp4Fileinvalid1(TestCase):
     def setUp(self):
-        self.file = mp4.File(self.filepath('mp4/invalid1.m4a'))
+        self.file = mp4.File(TestData.filepath('mp4/invalid1.m4a'))
 
     def test_find(self):
         eq_(self.file.atoms[0],self.file.find('mvhd'));
@@ -469,7 +469,7 @@ class TCMp4Fileinvalid1(TestCase):
 
 class TCMp4Filetest2(TestCase):
     def setUp(self):
-        self.file = mp4.File(self.filepath('mp4/test2.m4a'))
+        self.file = mp4.File(TestData.filepath('mp4/test2.m4a'))
 
     def test_info(self):
         eq_('Intro to Where It\'s At',self.file.title)
@@ -484,7 +484,7 @@ class TCMp4Filetest2(TestCase):
 
 class TCMp4Filetest3(TestCase):
     def setUp(self):
-        self.file = mp4.File(expand_mp4(self.filepath('mp4/test3.m4a')))
+        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test3.m4a')))
 
     def test_info(self):
         assert isinstance(self.file.title,str)
@@ -503,14 +503,14 @@ class TCMp4Filetest3(TestCase):
 
 class TCMp4Filetest4(TestCase):
     def setUp(self):
-        self.file = mp4.File(expand_mp4(self.filepath('mp4/test4.m4a')))
+        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test4.m4a')))
 
     def test_info(self):
         eq_('2005',self.file.year)
 
 class TCMp4Filetest5(TestCase):
     def setUp(self):
-        self.file = mp4.File(expand_mp4(self.filepath('mp4/test5.m4a')))
+        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test5.m4a')))
 
     def test_info(self):
         eq_('Hip Hop/Rap',self.file.genre)
@@ -518,7 +518,7 @@ class TCMp4Filetest5(TestCase):
 
 class TCMp4Filetest6(TestCase):
     def setUp(self):
-        self.file = mp4.File(expand_mp4(self.filepath('mp4/test6.m4p')))
+        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test6.m4p')))
 
     def test_info(self):
         """The type of this file in stsd is drms, which isn't present in th emp4 layout doc.
@@ -530,7 +530,7 @@ class TCMp4Filetest6(TestCase):
 
 class TCMp4Filetest7(TestCase):
     def setUp(self):
-        self.file = mp4.File(expand_mp4(self.filepath('mp4/test7.m4a')))
+        self.file = mp4.File(expand_mp4(TestData.filepath('mp4/test7.m4a')))
 
     def test_info(self):
         """This file is a lossless aac file.
