@@ -6,7 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from . import aiff
+from .. import aiff
 from .testcase import TestCase, eq_
 
 class AiffFile(TestCase):

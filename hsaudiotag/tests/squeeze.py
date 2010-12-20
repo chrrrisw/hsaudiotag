@@ -16,7 +16,7 @@ import re
 from io import BytesIO
 from struct import unpack
 
-from . import mpeg, id3v2, mp4
+from .. import mpeg, id3v2, mp4
 
 def squeeze_mpeg(inpath, outpath):
     # takes the file in `inpath`, squeezes it, and put the result in `outpath`

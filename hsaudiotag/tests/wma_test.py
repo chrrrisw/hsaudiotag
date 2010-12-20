@@ -6,7 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from . import wma
+from .. import wma
 from .testcase import TestCase, eq_
 
 class TCWma(TestCase):

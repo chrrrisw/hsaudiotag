@@ -8,7 +8,7 @@
 
 import io
 
-from . import mpeg
+from .. import mpeg
 from .squeeze import expand_mpeg
 from .testcase import TestCase, eq_
 

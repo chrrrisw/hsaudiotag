@@ -6,7 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from .id3v2 import Id3v2, Header, POS_END, _read_id3_string
+from ..id3v2 import Id3v2, Header, POS_END, _read_id3_string
 from .squeeze import expand_mpeg
 from .testcase import TestCase, eq_
 

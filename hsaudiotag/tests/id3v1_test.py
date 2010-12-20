@@ -6,7 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from .id3v1 import *
+from ..id3v1 import *
 from .testcase import TestCase, eq_
 
 class TCId3v1(TestCase):

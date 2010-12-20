@@ -8,7 +8,7 @@
 
 import io
 
-from . import mp4
+from .. import mp4
 from .squeeze import expand_mp4
 from .testcase import TestCase, TestData, eq_
 
