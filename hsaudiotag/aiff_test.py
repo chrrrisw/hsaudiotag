@@ -6,8 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-import unittest
-
 from . import aiff
 from .testcase import TestCase
 
@@ -35,6 +33,3 @@ class AiffFile(TestCase):
         self.assertEqual(f.audio_offset, 46)
         self.assertEqual(f.audio_size, 42)
     
-
-if __name__ == "__main__":
-	unittest.main()

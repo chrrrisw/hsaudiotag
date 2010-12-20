@@ -6,8 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-import unittest
-
 from . import ogg
 from .testcase import TestCase
 
@@ -114,6 +112,3 @@ class TCOggVorbis(TestCase):
         o = ogg.Vorbis(self.filepath('mp4/test1.m4a'))
         self.verify_emptyness(o)
     
-
-if __name__ == "__main__":
-	unittest.main()

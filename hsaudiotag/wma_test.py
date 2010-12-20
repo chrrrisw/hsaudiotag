@@ -6,8 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-import unittest
-
 from . import wma
 from .testcase import TestCase
 
@@ -120,6 +118,3 @@ class TCWma(TestCase):
         self.assertEqual(w.bitrate, 327)
         self.assertEqual(w.duration, 539)
     
-
-if __name__ == "__main__":
-	unittest.main()

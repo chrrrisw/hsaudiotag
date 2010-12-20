@@ -6,7 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-import unittest
 import io
 
 from . import mpeg
@@ -270,6 +269,3 @@ class TCFrameBrowser(TestCase):
         self.assertEqual(fcount, 39)
         self.assertEqual(size, 39 * 417)
     
-
-if __name__ == "__main__":
-    unittest.main()
