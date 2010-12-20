@@ -6,13 +6,11 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-
-
 import struct
 from struct import unpack
 from io import BytesIO
 
-from hsutil.files import FileOrPath
+from .util import FileOrPath
 
 #Object IDs
 WMA_ID_SIZE = 16

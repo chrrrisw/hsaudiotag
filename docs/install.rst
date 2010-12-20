@@ -1,7 +1,7 @@
 Dependencies
 ============
 
-``hsaudiotag3k`` requires Python 3.1 and `hsutil <http://hg.hardcoded.net/hsutil>`_ and `py.test <http://codespeak.net/py/dist/>`_.
+``hsaudiotag3k`` requires Python 3.1. If you want to run the tests, you'll need `pytest <http://pytest.org/>`_.
 
 Installation
 ============

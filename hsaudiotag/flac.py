@@ -8,8 +8,7 @@
 
 from struct import unpack
 
-from hsutil.files import FileOrPath
-
+from .util import FileOrPath
 from . import ogg
 
 STREAMINFO = 0

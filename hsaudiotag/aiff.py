@@ -15,7 +15,7 @@ import struct
 from io import BytesIO
 
 from .id3v2 import Id3v2
-from hsutil.files import FileOrPath
+from .util import FileOrPath
 
 HEADER_SIZE = 8
 

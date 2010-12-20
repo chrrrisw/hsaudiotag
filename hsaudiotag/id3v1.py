@@ -8,7 +8,7 @@
 
 import struct
 
-from hsutil.files import FileOrPath
+from .util import FileOrPath
 from .genres import genre_by_index
 
 TAG_VERSION_1_0 = 1

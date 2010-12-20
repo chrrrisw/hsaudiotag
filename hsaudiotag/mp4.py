@@ -9,9 +9,7 @@
 import re
 import struct
 
-from hsutil.files import open_if_filename
-from hsutil.misc import tryint
-
+from .util import open_if_filename, tryint
 from .genres import genre_by_index
 
 HEADER_SIZE = 8

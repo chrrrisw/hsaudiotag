@@ -10,9 +10,7 @@ import io
 import struct
 import re
 
-from hsutil.misc import cond, tryint
-from hsutil.files import FileOrPath
-
+from .util import cond, tryint, FileOrPath
 from .genres import genre_by_index
 
 ID_ID3 = b'ID3'

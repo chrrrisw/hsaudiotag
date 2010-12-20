@@ -8,7 +8,7 @@
 
 from struct import unpack
 
-from hsutil.files import FileOrPath
+from .util import FileOrPath
 
 class InvalidFileError(Exception):
     pass

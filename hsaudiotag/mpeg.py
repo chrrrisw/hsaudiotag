@@ -6,15 +6,12 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-
-
 from . import id3v1
 from . import id3v2
 import struct
 from struct import unpack
 
-from hsutil.misc import tryint
-from hsutil.files import FileOrPath
+from .util import tryint, FileOrPath
 
 HEADER_SIZE = 4
 
