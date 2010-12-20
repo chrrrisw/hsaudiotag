@@ -6,11 +6,17 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from hsutil.testutil import TestData as TestDataBase, eq_
-from hsutil.path import Path
+import os.path as op
 
-class TestData(TestDataBase):
-    @classmethod
-    def datadirpath(cls):
-        return Path(__file__)[:-1] + 'testdata'
-    
+def eq_(a, b, msg=None):
+    assert a == b, msg or "%r != %r" % (a, b)
+
+class TestData:
+    @staticmethod
+    def filepath(relative_path, *args):
+        if args:
+            relative_path = op.join([relative_path] + list(args))
+        datadirpath = op.join(op.dirname(__file__), 'testdata')
+        resultpath = op.join(datadirpath, relative_path)
+        assert op.exists(resultpath)
+        return resultpath
