@@ -8,8 +8,6 @@
 
 # http://www.cnpbagwell.com/aiff-c.txt
 
-
-
 import logging
 import struct
 from io import BytesIO
@@ -39,7 +37,7 @@ def read_float(s): # 10 bytes
         f = (himant * 0x100000000 + lomant) * pow(2.0, expon - 63)
     return sign * f
 
-class Chunk(object):
+class Chunk:
     def __init__(self, fp):
         self._fp = fp
         self.position = fp.tell()
@@ -60,6 +58,7 @@ class File(Chunk):
     def __init__(self, infile):
         self.valid = False
         self.tag = None
+        self.duration = self.bitrate = self.sample_rate = self.audio_offset = self.audio_size = 0
         with FileOrPath(infile) as fp:
             try:
                 Chunk.__init__(self, fp)

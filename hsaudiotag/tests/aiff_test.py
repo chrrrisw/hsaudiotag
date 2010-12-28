@@ -10,9 +10,15 @@ from .. import aiff
 from .util import TestData, eq_
 
 def test_random():
-    # a random file is not valid
+    # a random file is not valid but has its attributes set.
     f = aiff.File(TestData.filepath('randomfile'))
     assert not f.valid
+    eq_(f.duration, 0)
+    eq_(f.sample_rate, 0)
+    eq_(f.bitrate, 0)
+    assert f.tag is None
+    eq_(f.audio_offset, 0)
+    eq_(f.audio_size, 0)
 
 def test_long_comm_field():
     # some COMM fields are longer than 18 bytes. They must be supported
