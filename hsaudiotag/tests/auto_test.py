@@ -6,7 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from .. import auto
+from .. import auto, mp4
 from .squeeze import expand_mp4, expand_mpeg
 from .util import TestData, eq_
 
@@ -111,3 +111,13 @@ def test_aiff():
     eq_(f.artist, 'Assimil')
     eq_(f.audio_offset, 46)
     eq_(f.audio_size, 42)
+
+def test_close_is_called_on_mp4(monkeypatch):
+    # The mp4 file has to be closed after being read.
+    closed = False
+    def mock_close(self):
+        nonlocal closed
+        closed = True
+    monkeypatch.setattr(mp4.File, 'close', mock_close)
+    f = auto.File(expand_mp4(TestData.filepath('mp4/test1.m4a')))
+    assert closed

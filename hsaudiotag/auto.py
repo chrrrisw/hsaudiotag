@@ -37,6 +37,8 @@ class File:
             self._set_attrs(f)
         else:
             self._set_invalid_attrs()
+        if hasattr(f, 'close'):
+            f.close()
     
     @staticmethod
     def _guess_class(infile):
