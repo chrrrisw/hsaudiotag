@@ -91,7 +91,7 @@ def get_vbr_coefficient(version, layer):
         else:
             return 72     
 
-class MpegFrameHeader(object):
+class MpegFrameHeader:
     def __init__(self, data): 
         #data = HEADER_SIZE bytes integer
         self.valid = False
@@ -127,27 +127,27 @@ class MpegFrameHeader(object):
                 self.valid = False
     
 
-class XingHeader(object):
+class XingHeader:
     def __init__(self, data): #data is a 128 bytes str
         self.valid = data[:4] == b'Xing'
         self.frames = unpack('!I', data[8:12])[0]
         self.size = unpack('!I', data[12:16])[0]
         self.scale = data[119]
     
-class FhgHeader(object):
+class FhgHeader:
     def __init__(self, data):
         self.valid = data[:4] == b'VBRI'
         self.frames = unpack('!I', data[14:18])[0]
         self.size = unpack('!I', data[10:14])[0]
         self.scale = unpack('B', data[9:10])[0]
     
-class ComputedVBRHeader(object):
+class ComputedVBRHeader:
     def __init__(self, frame_browser):
         self.valid = True
         self.frames, self.size = frame_browser.stats()
     
 
-class FrameBrowser(object):
+class FrameBrowser:
     def __init__(self, fp):
         self.fp = fp
         self.frame_index = 0
@@ -232,7 +232,7 @@ def get_vbr_info(fp, b):
         if next(b).bitrate != br:
             return ComputedVBRHeader(b)
 
-class Mpeg(object):
+class Mpeg:
     def __init__(self, infile):
         with FileOrPath(infile) as fp:
             self.id3v1 = id3v1.Id3v1(fp)
@@ -258,7 +258,8 @@ class Mpeg(object):
                     frames, size = b.stats()
                     self.duration = size // (self.bitrate * 125)
             else:
-                self.duration = 0    
+                self.duration = 0
+            self.valid = self._frameheader.valid
     
     #--- Properties
     @property

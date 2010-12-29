@@ -13,7 +13,7 @@ from .util import FileOrPath
 class InvalidFileError(Exception):
     pass
 
-class VorbisPage(object):
+class VorbisPage:
     OGG_PAGE_ID = b'OggS'
     BASE_SIZE = 0x1b
     MAX_SIZE = 0x1b + 0xff
@@ -41,7 +41,7 @@ class VorbisPage(object):
         return self.fp.read(self.size)
     
 
-class VorbisComment(object):
+class VorbisComment:
     def __init__(self, data):
         def get_field(field_name):
             data = meta_data.get(field_name, b'')
@@ -72,7 +72,7 @@ class VorbisComment(object):
                 self.year = description[index+6:index+10]
     
 
-class Vorbis(object):
+class Vorbis:
     def __init__(self, infile):
         with FileOrPath(infile, 'rb') as fp:
             try:
@@ -81,6 +81,7 @@ class Vorbis(object):
                 self._empty()
     
     def _empty(self):
+        self.valid = False
         self.bitrate = 0
         self.artist = ''
         self.album = ''
@@ -147,4 +148,5 @@ class Vorbis(object):
             raise InvalidFileError()
         self.sample_count = page.position
         self.duration = self.sample_count // self.sample_rate
+        self.valid = True
     

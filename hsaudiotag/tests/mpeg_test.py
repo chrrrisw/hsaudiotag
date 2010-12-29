@@ -18,15 +18,16 @@ class TestMpeg:
         # of 0x800, but the first frame header is only at 0x9a1. There is also a
         # id3v1 tag at the end of the file.
         m = mpeg.Mpeg(expand_mpeg(TestData.filepath('mpeg/test1.mp3')))
-        eq_(m.size,2355703)
-        eq_(m.bitrate,128)
-        eq_(m.duration,147)
+        assert m.valid
+        eq_(m.size, 2355703)
+        eq_(m.bitrate, 128)
+        eq_(m.duration, 147)
         assert m.id3v1.exists
         assert m.id3v2.exists
         assert m.tag is m.id3v2
-        eq_(m.audio_offset,0x9a1)
-        eq_(m.audio_size,m.size - 128 - 0x9a1)
-        eq_(44100,m.sample_rate)
+        eq_(m.audio_offset, 0x9a1)
+        eq_(m.audio_size, m.size - 128 - 0x9a1)
+        eq_(m.sample_rate, 44100)
     
     def test2(self):
         # test2.mp3: same as test 1, but with the id3v2 tag removed
@@ -110,6 +111,7 @@ class TestMpeg:
     
     def testZeroFile(self):
         m = mpeg.Mpeg(TestData.filepath('zerofile'))
+        assert not m.valid
         eq_(m.size,0)
         eq_(m.bitrate,0)
         eq_(m.duration,0)
