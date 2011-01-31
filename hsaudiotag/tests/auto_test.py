@@ -112,6 +112,14 @@ def test_aiff():
     eq_(f.audio_offset, 46)
     eq_(f.audio_size, 42)
 
+def test_aiff_without_tag():
+    # We don't crash on AIFF files without tags.
+    f = auto.File(TestData.filepath('aiff/without_id3.aif')) # no crash
+    assert f.valid
+    eq_(f.duration, 132)
+    eq_(f.artist, '')
+    eq_(f.track, 0)
+
 def test_close_is_called_on_mp4(monkeypatch):
     # The mp4 file has to be closed after being read.
     closed = False

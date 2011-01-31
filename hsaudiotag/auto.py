@@ -32,11 +32,10 @@ class File:
     to all file types.
     """
     def __init__(self, infile):
+        self._set_invalid_attrs()
         f = self._guess_class(infile)
         if f is not None:
             self._set_attrs(f)
-        else:
-            self._set_invalid_attrs()
         if hasattr(f, 'close'):
             f.close()
     
@@ -62,8 +61,9 @@ class File:
         for attrname in AUDIO_ATTRS:
             setattr(self, attrname, getattr(f, attrname))
         tag = f.tag if hasattr(f, 'tag') else f
-        for attrname in TAG_ATTRS:
-            setattr(self, attrname, getattr(tag, attrname))
+        if tag is not None:
+            for attrname in TAG_ATTRS:
+                setattr(self, attrname, getattr(tag, attrname))
     
     def _set_invalid_attrs(self):
         self.valid = False
@@ -71,5 +71,6 @@ class File:
         for attrname in AUDIO_ATTRS:
             setattr(self, attrname, 0)
         for attrname in TAG_ATTRS:
-            setattr(self, attrname, '')
+            default = '' if attrname != 'track' else 0
+            setattr(self, attrname, default)
     
