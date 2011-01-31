@@ -160,7 +160,7 @@ class AttributeDataAtom(Atom):
         #Convert to unicode if needed
         if isinstance(result[2], bytes):
             result = list(result)
-            result[2] = result[2].decode('utf-8')
+            result[2] = result[2].decode('utf-8', 'ignore')
             result = tuple(result)
         return result
     

@@ -536,3 +536,10 @@ def test_empty_attribute_atom():
     # empty_attribute_atom.m4a has its title atom with no sub node.
     fp = mp4.File(TestData.filepath('mp4/empty_attribute_atom.m4a'))
     eq_(fp.title, '') # don't crash
+
+def test_invalid_utf8():
+    # If an mp4 file contains invalid utf-8 data, just ignore it and read what you can.
+    # The "invalid_utf8.m4a" file has it's "artist" field last letter replaced by \xe9, which
+    # is invalid by itself
+    fp = mp4.File(TestData.filepath('mp4/invalid_utf8.m4a'))
+    eq_(fp.artist, 'Billy Talen')
