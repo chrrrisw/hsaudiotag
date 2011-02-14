@@ -6,19 +6,15 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from __future__ import division
-
-import cStringIO
+import io
 import struct
 import re
 
-from hsutil.misc import cond, tryint
-from hsutil.files import FileOrPath
+from .util import cond, tryint, FileOrPath
+from .genres import genre_by_index
 
-from .genres import MUSIC_GENRES
-
-ID_ID3 = 'ID3'
-ID_3DI = '3DI'
+ID_ID3 = b'ID3'
+ID_3DI = b'3DI'
 #The id3 flags are backwards
 FLAG_UNSYNCH = 1 << 7
 FLAG_EXT_HEADER = 1 << 6
@@ -35,7 +31,7 @@ def _read_id3_size(rawsize, syncsafe=True):
     if len(rawsize) != 4:
         return 0
     if syncsafe:
-        b1, b2, b3, b4 = (ord(b) for b in rawsize)
+        b1, b2, b3, b4 = rawsize
         return (b1 * 0x200000) + (b2 * 0x4000) + (b3 * 0x80) + b4
     else:
         return struct.unpack('!i', rawsize)[0]
@@ -47,19 +43,19 @@ def _read_id3_string(s, stringtype, nullreplace='\n'):
     if stringtype == 1:
         # This is a safekeeping code. Under normal circumstances, it shouldn't
         # happen to have a \0 or a second BOM or no BOM in a type 1 string
-        le = '\xff\xfe'
-        be = '\xfe\xff'
+        le = b'\xff\xfe'
+        be = b'\xfe\xff'
         bom = s[:2]
         if bom in (le, be):
-            therest = s[2:].replace(be, '').replace(le, '')
+            therest = s[2:].replace(be, b'').replace(le, b'')
             s = bom + therest
         else:
             s = le + s
     try:
-        s = s.decode(encoding)
+        s = str(s, encoding)
     except UnicodeDecodeError:
         try:
-            s = (s + '\0').decode(encoding)
+            s = str(s + b'\0', encoding)
         except UnicodeDecodeError:
             s = ''
     if nullreplace != '\0':
@@ -79,9 +75,9 @@ class Header(object):
         header = fp.read(SIZE_HEADER)
         if header[0:3] != header_id:
             return
-        self.vmajor = ord(header[3])
-        self.vminor = ord(header[4])
-        self.hflags = ord(header[5])
+        self.vmajor = header[3]
+        self.vminor = header[4]
+        self.hflags = header[5]
         self.datasize = _read_id3_size(header[6:10], syncsafe=True)
         self.tagsize = self.datasize + SIZE_HEADER
         if FLAG_FOOTER & self.hflags:
@@ -103,10 +99,9 @@ class ExtHeader(object):
 class FrameDataText(object):
     def __init__(self, fp):
         self.text = ''
-        stringtype = ord(fp.read(1))
-        if stringtype not in STRING_ENCODINGS:
-            raise ValueError('%d is not a valid string type' % stringtype)
-        self.text = _read_id3_string(fp.read(), stringtype)
+        stringtype = fp.read(1)[0]
+        if stringtype in STRING_ENCODINGS:
+            self.text = _read_id3_string(fp.read(), stringtype)
     
     @staticmethod
     def supports(frameid):
@@ -116,13 +111,12 @@ class FrameDataText(object):
 class FrameDataComment(object):
     def __init__(self, fp):
         self._text = ('', '')
-        stringtype = ord(fp.read(1))
+        stringtype = fp.read(1)[0]
         language = fp.read(3)
-        if stringtype not in STRING_ENCODINGS:
-            raise ValueError('%d is not a valid string type' % stringtype)
-        text = fp.read()
-        text = _read_id3_string(text, stringtype, '\0')
-        self._text = tuple(text.split('\0'))
+        if stringtype in STRING_ENCODINGS:
+            text = fp.read()
+            text = _read_id3_string(text, stringtype, '\0')
+            self._text = tuple(text.split('\0'))
     
     @staticmethod
     def supports(frameid):
@@ -152,7 +146,7 @@ class Id3Frame(object):
     def __init__(self, fp, frame_id, size):
         self.frame_id = frame_id
         self.size = size
-        self.rawdata = cStringIO.StringIO(fp.read(size))
+        self.rawdata = io.BytesIO(fp.read(size))
         self._data = None
     
     @property
@@ -176,13 +170,13 @@ class Id3Frame(object):
 
 class Id3v22Frame(Id3Frame):
     def __init__(self, fp):
-        frame_id = fp.read(3)
-        size = _read_id3_size(chr(0) + fp.read(3), syncsafe=False)
+        frame_id = str(fp.read(3), 'ascii', 'replace')
+        size = _read_id3_size(b'\0' + fp.read(3), syncsafe=False)
         Id3Frame.__init__(self, fp, frame_id, size)
 
 class Id3v23Frame(Id3Frame):
     def __init__(self, fp, syncsafe):
-        frameid = fp.read(4)
+        frameid = str(fp.read(4), 'ascii', 'replace')
         size = _read_id3_size(fp.read(4), syncsafe=syncsafe)
         flags = fp.read(2)
         Id3Frame.__init__(self, fp, frameid, size)
@@ -209,7 +203,7 @@ class Id3v2(object):
                     pass
             self._header = h
             if self.exists:
-                data = cStringIO.StringIO(fp.read(self.data_size))
+                data = io.BytesIO(fp.read(self.data_size))
                 if FLAG_EXT_HEADER & self.flags:
                     self._extheader = ExtHeader(data, self._header.vmajor)
                 self._read_frames(data)
@@ -296,10 +290,7 @@ class Id3v2(object):
         match = re_numeric_genre.match(genre)
         if match:
             index = int(match.group(1))
-            try:
-                return MUSIC_GENRES[index]
-            except IndexError:
-                return genre
+            return genre_by_index(index)
         else:
             return genre
     

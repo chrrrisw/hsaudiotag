@@ -8,14 +8,12 @@
 
 # http://www.cnpbagwell.com/aiff-c.txt
 
-from __future__ import division
-
 import logging
 import struct
-from cStringIO import StringIO
+from io import BytesIO
 
 from .id3v2 import Id3v2
-from hsutil.files import FileOrPath
+from .util import FileOrPath
 
 HEADER_SIZE = 8
 
@@ -36,10 +34,10 @@ def read_float(s): # 10 bytes
         f = _HUGE_VAL
     else:
         expon = expon - 16383
-        f = (himant * 0x100000000L + lomant) * pow(2.0, expon - 63)
+        f = (himant * 0x100000000 + lomant) * pow(2.0, expon - 63)
     return sign * f
 
-class Chunk(object):
+class Chunk:
     def __init__(self, fp):
         self._fp = fp
         self.position = fp.tell()
@@ -60,6 +58,7 @@ class File(Chunk):
     def __init__(self, infile):
         self.valid = False
         self.tag = None
+        self.duration = self.bitrate = self.sample_rate = self.audio_offset = self.audio_size = 0
         with FileOrPath(infile) as fp:
             try:
                 Chunk.__init__(self, fp)
@@ -76,10 +75,10 @@ class File(Chunk):
                 chunk = Chunk(self._fp)
             except NotAChunk:
                 break
-            if chunk.type == 'ID3 ':
+            if chunk.type == b'ID3 ':
                 chunk.read()
-                self.tag = Id3v2(StringIO(chunk.data))
-            elif chunk.type == 'COMM':
+                self.tag = Id3v2(BytesIO(chunk.data))
+            elif chunk.type == b'COMM':
                 chunk.read()
                 try:
                     channels, frame_count, sample_size, sample_rate = struct.unpack('>hLh10s', chunk.data[:18])
@@ -89,7 +88,7 @@ class File(Chunk):
                 self.sample_rate = int(read_float(sample_rate))
                 self.bitrate = channels * sample_size * self.sample_rate
                 self.duration = frame_count // self.sample_rate
-            elif chunk.type == 'SSND':
+            elif chunk.type == b'SSND':
                 self.audio_offset = chunk.position + HEADER_SIZE
                 self.audio_size = chunk.size
             self._fp.seek(chunk.position + HEADER_SIZE + chunk.size)

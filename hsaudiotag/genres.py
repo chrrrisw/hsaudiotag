@@ -156,3 +156,7 @@ MUSIC_GENRES = (
 "Anime",
 "JPop",
 "Synthpop")
+
+def genre_by_index(index):
+    return MUSIC_GENRES[index] if index >= 0 and index < len(MUSIC_GENRES) else ''
+

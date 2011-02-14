@@ -6,24 +6,22 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from __future__ import division
-
 import re
 import struct
 
-from hsutil.files import open_if_filename
-from hsutil.misc import tryint
-
-from .genres import MUSIC_GENRES
+from .util import open_if_filename, tryint
+from .genres import genre_by_index
 
 HEADER_SIZE = 8
 
-re_atom_type = re.compile(r'[A-Za-z0-9\-\xa9]{4}')
+re_atom_type = re.compile(r'[A-Za-z0-9\-©]{4}')
 
 def read_atom_header(readfunc, offset):
     header = readfunc(offset, HEADER_SIZE)
     if len(header) == HEADER_SIZE:
-        return tuple(struct.unpack('!i4s',header))
+        size, byte_type = struct.unpack('!i4s', header)
+        str_type = str(byte_type, 'latin-1')
+        return (size, str_type)
     else:
         return ()
 
@@ -33,7 +31,7 @@ def is_valid_atom_type(atom_type):
 
 # Base atom classes *****************************************
 
-class Atom(object):
+class Atom:
     cls_data_model = ''
     
     def __init__(self, parent, start_offset, header=None):
@@ -119,6 +117,9 @@ class AtomBox(Atom):
     #--- Public
     def find(self, atom_type):
         gotta_find = atom_type[:4]
+        # You'd think that iterating through atoms is slow and that there should be a {type:atom}
+        # mapping, but the tests I've done on real data shows that doing so is in fact slower.
+        # I think this is because most atoms have only a few subatoms.
         for atom in self.atoms:
             if atom.type == gotta_find:
                 if len(atom_type) >= 9:
@@ -142,7 +143,11 @@ class AttributeAtom(AtomBox):
     
     @property
     def attr_data(self):
-        return self.atoms[0].attr_data
+        try:
+            return self.atoms[0].attr_data
+        except IndexError:
+            # For some reason, our attribute atom has no data sub-atom, no biggie, just return nothing.
+            return ''
     
 
 class AttributeDataAtom(Atom):
@@ -153,9 +158,9 @@ class AttributeDataAtom(Atom):
     def _read_atom_data(self):
         result = Atom._read_atom_data(self)
         #Convert to unicode if needed
-        if (isinstance(result[2], basestring)) and any(ord(c) >= 0x80 for c in result[2]):
+        if isinstance(result[2], bytes):
             result = list(result)
-            result[2] = result[2].decode('utf-8')
+            result[2] = result[2].decode('utf-8', 'ignore')
             result = tuple(result)
         return result
     
@@ -202,23 +207,23 @@ class MdhdAtom(Atom):
 class StsdAtom(AtomBox):
     def _get_data_model(self):
         [version] = struct.unpack('4s', self.read(12, 4))
-        if version in ('mp4v', 'avc1', 'encv', 's263'):
+        if version in (b'mp4v', b'avc1', b'encv', b's263'):
             return'94s'
-        elif version in ('mp4a', 'drms', 'enca', 'samr', 'sawb'):
+        elif version in (b'mp4a', b'drms', b'enca', b'samr', b'sawb'):
             return '44s'
         else:
             return '24s'
     
 
 ATOM_SPECS = {
-    '\xa9nam': AttributeAtom,
-    '\xa9ART': AttributeAtom,
-    '\xa9wrt': AttributeAtom,
-    '\xa9alb': AttributeAtom,
-    '\xa9too': AttributeAtom,
-    '\xa9day': AttributeAtom,
-    '\xa9cmt': AttributeAtom,
-    '\xa9gen': AttributeAtom,
+    '©nam': AttributeAtom,
+    '©ART': AttributeAtom,
+    '©wrt': AttributeAtom,
+    '©alb': AttributeAtom,
+    '©too': AttributeAtom,
+    '©day': AttributeAtom,
+    '©cmt': AttributeAtom,
+    '©gen': AttributeAtom,
     'data': AttributeDataAtom,
     'esds': EsdsAtom,
     'gnre': GnreAtom,
@@ -260,11 +265,11 @@ class File(AtomBox):
     
     @property
     def album(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9alb')
+        return self._get_attr('moov.udta.meta.ilst.©alb')
     
     @property
     def artist(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9ART')
+        return self._get_attr('moov.udta.meta.ilst.©ART')
     
     @property
     def audio_offset(self):
@@ -283,7 +288,7 @@ class File(AtomBox):
     
     @property
     def comment(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9cmt')
+        return self._get_attr('moov.udta.meta.ilst.©cmt')
     
     @property
     def duration(self):
@@ -294,11 +299,11 @@ class File(AtomBox):
     def genre(self):
         data = self._get_attr('moov.udta.meta.ilst.gnre')
         if not data:
-            data = self._get_attr('moov.udta.meta.ilst.\xa9gen')
-        if isinstance(data, basestring):
+            data = self._get_attr('moov.udta.meta.ilst.©gen')
+        if isinstance(data, str):
             return data
         elif isinstance(data, int):
-            return MUSIC_GENRES[data - 1]
+            return genre_by_index(data - 1)
         else:
             return ''
     
@@ -309,7 +314,7 @@ class File(AtomBox):
     
     @property
     def title(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9nam')
+        return self._get_attr('moov.udta.meta.ilst.©nam')
     
     @property
     def track(self):
@@ -321,5 +326,5 @@ class File(AtomBox):
     
     @property
     def year(self):
-        return self._get_attr('moov.udta.meta.ilst.\xa9day')[:4]
+        return self._get_attr('moov.udta.meta.ilst.©day')[:4]
     
