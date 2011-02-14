@@ -4,13 +4,14 @@ CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
-    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 2.6',
+    'Programming Language :: Python :: 2.7',
 ]
 
 LONG_DESC = open('README', 'rt').read() + '\n\n' + open('CHANGES', 'rt').read()
 
 setup(
-    name='hsaudiotag3k',
+    name='hsaudiotag',
     version='1.1.1',
     author='Hardcoded Software',
     author_email='hsoft@hardcoded.net',

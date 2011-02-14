@@ -1,7 +1,7 @@
 Dependencies
 ============
 
-``hsaudiotag3k`` requires Python 3.1. If you want to run the tests, you'll need `pytest <http://pytest.org/>`_.
+``hsaudiotag`` requires Python 2.6 and up. If you want to run the tests, you'll need `pytest <http://pytest.org/>`_.
 
 Installation
 ============
