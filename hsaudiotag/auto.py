@@ -41,7 +41,7 @@ class File(object):
     
     @staticmethod
     def _guess_class(infile):
-        if isinstance(infile, unicode):
+        if isinstance(infile, basestring):
             # Try a fast path to the right class instead of trying all classes sequencially.
             ext = op.splitext(infile)[1][1:]
             if ext in EXT2CLASS:

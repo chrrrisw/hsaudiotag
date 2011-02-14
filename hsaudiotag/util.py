@@ -12,7 +12,7 @@ def open_if_filename(file_or_path, mode=u'rb'):
     if it is a string, a file will be opened with mode.
     Returns a tuple (file, should_be_closed).
     """
-    if isinstance(file_or_path, unicode):
+    if isinstance(file_or_path, basestring):
         return (open(file_or_path, mode), True)
     else:
         return (file_or_path, False)
