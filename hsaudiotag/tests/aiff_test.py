@@ -11,7 +11,7 @@ from .util import TestData, eq_
 
 def test_random():
     # a random file is not valid but has its attributes set.
-    f = aiff.File(TestData.filepath('randomfile'))
+    f = aiff.File(TestData.filepath(u'randomfile'))
     assert not f.valid
     eq_(f.duration, 0)
     eq_(f.sample_rate, 0)
@@ -22,19 +22,19 @@ def test_random():
 
 def test_long_comm_field():
     # some COMM fields are longer than 18 bytes. They must be supported
-    f = aiff.File(TestData.filepath('aiff/long_comm_field.aif'))
+    f = aiff.File(TestData.filepath(u'aiff/long_comm_field.aif'))
     assert f.valid
     eq_(f.duration, 132)
 
 def test_with_id3():
     # this file is a track encoded from a CD with iTunes. It has a ID3 chunk. The SSND chunk
     # has been manually truncated (the file was 22mb)
-    f = aiff.File(TestData.filepath('aiff/with_id3.aif'))
+    f = aiff.File(TestData.filepath(u'aiff/with_id3.aif'))
     assert f.valid
     eq_(f.duration, 132)
     eq_(f.sample_rate, 44100)
     eq_(f.bitrate, 1411200)
-    eq_(f.tag.artist, 'Assimil') # The id3v2 module takes care of it, no need to test it further
+    eq_(f.tag.artist, u'Assimil') # The id3v2 module takes care of it, no need to test it further
     eq_(f.audio_offset, 46)
     eq_(f.audio_size, 42)
 

@@ -6,6 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+from __future__ import with_statement
 from . import id3v1
 from . import id3v2
 import struct
@@ -91,7 +92,7 @@ def get_vbr_coefficient(version, layer):
         else:
             return 72     
 
-class MpegFrameHeader:
+class MpegFrameHeader(object):
     def __init__(self, data): 
         #data = HEADER_SIZE bytes integer
         self.valid = False
@@ -127,27 +128,27 @@ class MpegFrameHeader:
                 self.valid = False
     
 
-class XingHeader:
+class XingHeader(object):
     def __init__(self, data): #data is a 128 bytes str
-        self.valid = data[:4] == b'Xing'
+        self.valid = data[:4] == 'Xing'
         self.frames = unpack('!I', data[8:12])[0]
         self.size = unpack('!I', data[12:16])[0]
         self.scale = data[119]
     
-class FhgHeader:
+class FhgHeader(object):
     def __init__(self, data):
-        self.valid = data[:4] == b'VBRI'
+        self.valid = data[:4] == 'VBRI'
         self.frames = unpack('!I', data[14:18])[0]
         self.size = unpack('!I', data[10:14])[0]
         self.scale = unpack('B', data[9:10])[0]
     
-class ComputedVBRHeader:
+class ComputedVBRHeader(object):
     def __init__(self, frame_browser):
         self.valid = True
         self.frames, self.size = frame_browser.stats()
     
 
-class FrameBrowser:
+class FrameBrowser(object):
     def __init__(self, fp):
         self.fp = fp
         self.frame_index = 0
@@ -176,7 +177,7 @@ class FrameBrowser:
             if h.valid:
                 self.position += tag_index + h.tagsize
                 return self._seek()
-        index = data.find(b'\xff')
+        index = data.find('\xff')
         while (index > -1):
             try:
                 result = MpegFrameHeader(unpack('!I', data[index:index+HEADER_SIZE])[0])
@@ -190,7 +191,7 @@ class FrameBrowser:
                             return True
                     except struct.error:
                         pass
-                index = data.find(b'\xff', index+1)
+                index = data.find('\xff', index+1)
             except struct.error:
                 index = -1
         return False
@@ -201,7 +202,7 @@ class FrameBrowser:
         self._read()
         return self.frame
     
-    def __next__(self):
+    def next(self):
         if self.frame.valid:
             self.fp.seek(self.position + self.frame.size, 0)
             self._read()
@@ -209,10 +210,10 @@ class FrameBrowser:
         return self.frame
     
     def stats(self):
-        """Iterates over all frames and return (frame_count, total_size)"""
+        u"""Iterates over all frames and return (frame_count, total_size)"""
         self.first()
         size = self.frame.size
-        while next(self).valid:
+        while self.next().valid:
             size += self.frame.size
         return (self.frame_index, size)
     
@@ -223,16 +224,16 @@ def get_vbr_info(fp, b):
     fp.seek(vbr_offset + 4, 1)
     vbr_id = fp.read(4)
     fp.seek(-4, 1)
-    if vbr_id == b'Xing':
+    if vbr_id == 'Xing':
         return XingHeader(fp.read(128))
-    if vbr_id == b'VBRI':
+    if vbr_id == 'VBRI':
         return FhgHeader(fp.read(18))
     br = b.frame.bitrate
-    for i in range(4):
-        if next(b).bitrate != br:
+    for i in xrange(4):
+        if b.next().bitrate != br:
             return ComputedVBRHeader(b)
 
-class Mpeg:
+class Mpeg(object):
     def __init__(self, infile):
         with FileOrPath(infile) as fp:
             self.id3v1 = id3v1.Id3v1(fp)

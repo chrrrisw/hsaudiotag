@@ -6,19 +6,19 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-def open_if_filename(file_or_path, mode='rb'):
-    """
+def open_if_filename(file_or_path, mode=u'rb'):
+    u"""
     file_or_path can be either a string or a file-like object.
     if it is a string, a file will be opened with mode.
     Returns a tuple (file, should_be_closed).
     """
-    if isinstance(file_or_path, str):
+    if isinstance(file_or_path, unicode):
         return (open(file_or_path, mode), True)
     else:
         return (file_or_path, False)
 
-class FileOrPath:
-    def __init__(self, file_or_path, mode='rb'):
+class FileOrPath(object):
+    def __init__(self, file_or_path, mode=u'rb'):
         self.file_or_path = file_or_path
         self.mode = mode
         self.mustclose = False
@@ -34,7 +34,7 @@ class FileOrPath:
     
 
 def cond(condition, true_value, false_value):
-    """Return true_value if condition is true, and false_value otherwise.
+    u"""Return true_value if condition is true, and false_value otherwise.
     """
     return true_value if condition else false_value
 

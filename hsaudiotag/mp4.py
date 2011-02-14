@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Created By: Virgil Dupras
 # Created On: 2005/07/27
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
@@ -14,13 +15,13 @@ from .genres import genre_by_index
 
 HEADER_SIZE = 8
 
-re_atom_type = re.compile(r'[A-Za-z0-9\-©]{4}')
+re_atom_type = re.compile(ur'[A-Za-z0-9\-©]{4}')
 
 def read_atom_header(readfunc, offset):
     header = readfunc(offset, HEADER_SIZE)
     if len(header) == HEADER_SIZE:
         size, byte_type = struct.unpack('!i4s', header)
-        str_type = str(byte_type, 'latin-1')
+        str_type = unicode(byte_type, u'latin-1')
         return (size, str_type)
     else:
         return ()
@@ -31,7 +32,7 @@ def is_valid_atom_type(atom_type):
 
 # Base atom classes *****************************************
 
-class Atom:
+class Atom(object):
     cls_data_model = ''
     
     def __init__(self, parent, start_offset, header=None):
@@ -158,9 +159,9 @@ class AttributeDataAtom(Atom):
     def _read_atom_data(self):
         result = Atom._read_atom_data(self)
         #Convert to unicode if needed
-        if isinstance(result[2], bytes):
+        if isinstance(result[2], str):
             result = list(result)
-            result[2] = result[2].decode('utf-8', 'ignore')
+            result[2] = result[2].decode(u'utf-8', u'ignore')
             result = tuple(result)
         return result
     
@@ -207,46 +208,46 @@ class MdhdAtom(Atom):
 class StsdAtom(AtomBox):
     def _get_data_model(self):
         [version] = struct.unpack('4s', self.read(12, 4))
-        if version in (b'mp4v', b'avc1', b'encv', b's263'):
-            return'94s'
-        elif version in (b'mp4a', b'drms', b'enca', b'samr', b'sawb'):
+        if version in ('mp4v', 'avc1', 'encv', 's263'):
+            return '94s'
+        elif version in ('mp4a', 'drms', 'enca', 'samr', 'sawb'):
             return '44s'
         else:
             return '24s'
     
 
 ATOM_SPECS = {
-    '©nam': AttributeAtom,
-    '©ART': AttributeAtom,
-    '©wrt': AttributeAtom,
-    '©alb': AttributeAtom,
-    '©too': AttributeAtom,
-    '©day': AttributeAtom,
-    '©cmt': AttributeAtom,
-    '©gen': AttributeAtom,
-    'data': AttributeDataAtom,
-    'esds': EsdsAtom,
-    'gnre': GnreAtom,
-    'ilst': AtomBox,
-    'mdhd': MdhdAtom,
-    'mdia': AtomBox,
-    'meta': MetaAtom,
-    'minf': AtomBox,
-    'moov': AtomBox,
-    'stbl': AtomBox,
-    'stsd': StsdAtom,
-    'trak': AtomBox,
-    'trkn': AttributeAtom,
-    'udta': AtomBox,
+    u'©nam': AttributeAtom,
+    u'©ART': AttributeAtom,
+    u'©wrt': AttributeAtom,
+    u'©alb': AttributeAtom,
+    u'©too': AttributeAtom,
+    u'©day': AttributeAtom,
+    u'©cmt': AttributeAtom,
+    u'©gen': AttributeAtom,
+    u'data': AttributeDataAtom,
+    u'esds': EsdsAtom,
+    u'gnre': GnreAtom,
+    u'ilst': AtomBox,
+    u'mdhd': MdhdAtom,
+    u'mdia': AtomBox,
+    u'meta': MetaAtom,
+    u'minf': AtomBox,
+    u'moov': AtomBox,
+    u'stbl': AtomBox,
+    u'stsd': StsdAtom,
+    u'trak': AtomBox,
+    u'trkn': AttributeAtom,
+    u'udta': AtomBox,
 }
 
 # Mp4 File **********************************************************
 
 class File(AtomBox):
     def __init__(self, infile):
-        self._fp, self._shouldclose = open_if_filename(infile, 'rb')
+        self._fp, self._shouldclose = open_if_filename(infile, u'rb')
         self._fp.seek(0, 2)
-        AtomBox.__init__(self, None, 0, (self._fp.tell(), 'root'))
+        AtomBox.__init__(self, None, 0, (self._fp.tell(), u'root'))
     
     def _get_attr(self, path):
         atom = self.find(path)
@@ -265,66 +266,66 @@ class File(AtomBox):
     
     @property
     def album(self):
-        return self._get_attr('moov.udta.meta.ilst.©alb')
+        return self._get_attr(u'moov.udta.meta.ilst.©alb')
     
     @property
     def artist(self):
-        return self._get_attr('moov.udta.meta.ilst.©ART')
+        return self._get_attr(u'moov.udta.meta.ilst.©ART')
     
     @property
     def audio_offset(self):
-        atoms = [a for a in self.atoms if (a.size > 8) and (a.type == 'mdat')]
+        atoms = [a for a in self.atoms if (a.size > 8) and (a.type == u'mdat')]
         return atoms[0].start_offset if atoms else 0
     
     @property
     def audio_size(self):
-        atoms = [a for a in self.atoms if (a.size > 8) and (a.type == 'mdat')]
+        atoms = [a for a in self.atoms if (a.size > 8) and (a.type == u'mdat')]
         return atoms[0].size if atoms else 0
     
     @property
     def bitrate(self):
-        atom = self.find('moov.trak.mdia.minf.stbl.stsd.esds')
+        atom = self.find(u'moov.trak.mdia.minf.stbl.stsd.esds')
         return atom.bitrate // 1000 if atom else 0
     
     @property
     def comment(self):
-        return self._get_attr('moov.udta.meta.ilst.©cmt')
+        return self._get_attr(u'moov.udta.meta.ilst.©cmt')
     
     @property
     def duration(self):
-        atom = self.find('moov.trak.mdia.mdhd')
+        atom = self.find(u'moov.trak.mdia.mdhd')
         return atom.duration // self.sample_rate if atom else 0
     
     @property
     def genre(self):
-        data = self._get_attr('moov.udta.meta.ilst.gnre')
+        data = self._get_attr(u'moov.udta.meta.ilst.gnre')
         if not data:
-            data = self._get_attr('moov.udta.meta.ilst.©gen')
-        if isinstance(data, str):
+            data = self._get_attr(u'moov.udta.meta.ilst.©gen')
+        if isinstance(data, unicode):
             return data
         elif isinstance(data, int):
             return genre_by_index(data - 1)
         else:
-            return ''
+            return u''
     
     @property
     def sample_rate(self):
-        atom = self.find('moov.trak.mdia.mdhd')
+        atom = self.find(u'moov.trak.mdia.mdhd')
         return atom.sample_rate if atom else 0
     
     @property
     def title(self):
-        return self._get_attr('moov.udta.meta.ilst.©nam')
+        return self._get_attr(u'moov.udta.meta.ilst.©nam')
     
     @property
     def track(self):
-        return tryint(self._get_attr('moov.udta.meta.ilst.trkn'))
+        return tryint(self._get_attr(u'moov.udta.meta.ilst.trkn'))
     
     @property
     def valid(self):
-        return self.find('mdat') is not None
+        return self.find(u'mdat') is not None
     
     @property
     def year(self):
-        return self._get_attr('moov.udta.meta.ilst.©day')[:4]
+        return self._get_attr(u'moov.udta.meta.ilst.©day')[:4]
     

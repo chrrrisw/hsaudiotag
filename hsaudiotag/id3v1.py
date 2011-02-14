@@ -6,6 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+from __future__ import with_statement
 import struct
 
 from .util import FileOrPath
@@ -29,24 +30,24 @@ def _arrange_id3_field(raw_field):
     This function takes only the part of the string before the first \0 char.
     After this, it checks if the string has to be converted to unicode and convert it if it indeed does.
     """
-    decoded = str(raw_field, 'iso8859-1')
-    result = decoded.split('\0')
+    decoded = unicode(raw_field, u'iso8859-1')
+    result = decoded.split(u'\0')
     if len(result) > 0:
-        result = result[0].rstrip().replace('\n', ' ').replace('\r', ' ')
+        result = result[0].rstrip().replace(u'\n', u' ').replace(u'\r', u' ')
     else:
-        result = ''
+        result = u''
     return result
 
 class Id3v1(object):
     def __init__(self, infile):
         self.version = 0
         self.size = 0
-        self.title = ''
-        self.artist = ''
-        self.album = ''
-        self.year = ''
-        self.genre = ''
-        self.comment = ''
+        self.title = u''
+        self.artist = u''
+        self.album = u''
+        self.year = u''
+        self.genre = u''
+        self.comment = u''
         self.track = 0
         with FileOrPath(infile) as fp:
             self._read_file(fp)
@@ -59,13 +60,13 @@ class Id3v1(object):
             self._read_tag(fp.read(128))
     
     def _read_tag(self, data):
-        if data[0:3] != b'TAG':
+        if data[0:3] != 'TAG':
             return
         #check if the comment field contains track info
-        if ((data[125] == 0) and (data[126] != 0)) or ((data[125] == 0x20) and (data[126] != 0x20)):
+        if ((data[125] == '\0') and (data[126] != '\0')) or ((data[125] == '\x20') and (data[126] != '\x20')):
             #We have a v1.1
             self.version = TAG_VERSION_1_1
-            self.track = min(data[126], 99)
+            self.track = min(ord(data[126]), 99)
             self.comment = _arrange_id3_field(data[97:125])
         else:
             self.version = TAG_VERSION_1_0
@@ -75,7 +76,7 @@ class Id3v1(object):
         self.artist = _arrange_id3_field(data[33:63])
         self.album = _arrange_id3_field(data[63:93])
         self.year = _arrange_id3_field(data[93:97])
-        genre = data[127]
+        genre = ord(data[127])
         self.genre = genre_by_index(genre)
         self.size = 128
     

@@ -8,6 +8,7 @@
 
 # http://www.cnpbagwell.com/aiff-c.txt
 
+from __future__ import with_statement
 import logging
 import struct
 from io import BytesIO
@@ -37,7 +38,7 @@ def read_float(s): # 10 bytes
         f = (himant * 0x100000000 + lomant) * pow(2.0, expon - 63)
     return sign * f
 
-class Chunk:
+class Chunk(object):
     def __init__(self, fp):
         self._fp = fp
         self.position = fp.tell()
@@ -75,20 +76,20 @@ class File(Chunk):
                 chunk = Chunk(self._fp)
             except NotAChunk:
                 break
-            if chunk.type == b'ID3 ':
+            if chunk.type == 'ID3 ':
                 chunk.read()
                 self.tag = Id3v2(BytesIO(chunk.data))
-            elif chunk.type == b'COMM':
+            elif chunk.type == 'COMM':
                 chunk.read()
                 try:
                     channels, frame_count, sample_size, sample_rate = struct.unpack('>hLh10s', chunk.data[:18])
                 except struct.error:
-                    logging.warning('Could not unpack the COMM field %r' % chunk.data)
+                    logging.warning(u'Could not unpack the COMM field %r' % chunk.data)
                     raise
                 self.sample_rate = int(read_float(sample_rate))
                 self.bitrate = channels * sample_size * self.sample_rate
                 self.duration = frame_count // self.sample_rate
-            elif chunk.type == b'SSND':
+            elif chunk.type == 'SSND':
                 self.audio_offset = chunk.position + HEADER_SIZE
                 self.audio_size = chunk.size
             self._fp.seek(chunk.position + HEADER_SIZE + chunk.size)

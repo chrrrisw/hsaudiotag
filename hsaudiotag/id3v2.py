@@ -6,6 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+from __future__ import with_statement
 import io
 import struct
 import re
@@ -13,8 +14,8 @@ import re
 from .util import cond, tryint, FileOrPath
 from .genres import genre_by_index
 
-ID_ID3 = b'ID3'
-ID_3DI = b'3DI'
+ID_ID3 = 'ID3'
+ID_3DI = '3DI'
 #The id3 flags are backwards
 FLAG_UNSYNCH = 1 << 7
 FLAG_EXT_HEADER = 1 << 6
@@ -24,42 +25,42 @@ FLAG_FOOTER = 1 << 4
 POS_BEGIN = 0
 POS_END   = 1
 
-re_numeric_genre = re.compile(r'^\(?(\d{1,3})')
-re_frame_type = re.compile(r'[A-Z0-9]{3,4}')
+re_numeric_genre = re.compile(ur'^\(?(\d{1,3})')
+re_frame_type = re.compile(ur'[A-Z0-9]{3,4}')
 
 def _read_id3_size(rawsize, syncsafe=True):
     if len(rawsize) != 4:
         return 0
     if syncsafe:
-        b1, b2, b3, b4 = rawsize
+        b1, b2, b3, b4 = (ord(b) for b in rawsize)
         return (b1 * 0x200000) + (b2 * 0x4000) + (b3 * 0x80) + b4
     else:
         return struct.unpack('!i', rawsize)[0]
 
-STRING_ENCODINGS = {0: 'iso-8859-1', 1: 'utf-16', 2: 'utf-16be', 3: 'utf-8'}
+STRING_ENCODINGS = {0: u'iso-8859-1', 1: u'utf-16', 2: u'utf-16be', 3: u'utf-8'}
 
-def _read_id3_string(s, stringtype, nullreplace='\n'):
+def _read_id3_string(s, stringtype, nullreplace=u'\n'):
     encoding = STRING_ENCODINGS[stringtype]
     if stringtype == 1:
         # This is a safekeeping code. Under normal circumstances, it shouldn't
         # happen to have a \0 or a second BOM or no BOM in a type 1 string
-        le = b'\xff\xfe'
-        be = b'\xfe\xff'
+        le = '\xff\xfe'
+        be = '\xfe\xff'
         bom = s[:2]
         if bom in (le, be):
-            therest = s[2:].replace(be, b'').replace(le, b'')
+            therest = s[2:].replace(be, '').replace(le, '')
             s = bom + therest
         else:
             s = le + s
     try:
-        s = str(s, encoding)
+        s = unicode(s, encoding)
     except UnicodeDecodeError:
         try:
-            s = str(s + b'\0', encoding)
+            s = unicode(s + '\0', encoding)
         except UnicodeDecodeError:
-            s = ''
-    if nullreplace != '\0':
-        s = s.replace('\0', nullreplace)
+            s = u''
+    if nullreplace != u'\0':
+        s = s.replace(u'\0', nullreplace)
     return s
 
 SIZE_HEADER = 10
@@ -75,9 +76,9 @@ class Header(object):
         header = fp.read(SIZE_HEADER)
         if header[0:3] != header_id:
             return
-        self.vmajor = header[3]
-        self.vminor = header[4]
-        self.hflags = header[5]
+        self.vmajor = ord(header[3])
+        self.vminor = ord(header[4])
+        self.hflags = ord(header[5])
         self.datasize = _read_id3_size(header[6:10], syncsafe=True)
         self.tagsize = self.datasize + SIZE_HEADER
         if FLAG_FOOTER & self.hflags:
@@ -98,37 +99,37 @@ class ExtHeader(object):
 
 class FrameDataText(object):
     def __init__(self, fp):
-        self.text = ''
-        stringtype = fp.read(1)[0]
+        self.text = u''
+        stringtype = ord(fp.read(1)[0])
         if stringtype in STRING_ENCODINGS:
             self.text = _read_id3_string(fp.read(), stringtype)
     
     @staticmethod
     def supports(frameid):
-        return frameid.startswith('T')
+        return frameid.startswith(u'T')
     
 
 class FrameDataComment(object):
     def __init__(self, fp):
-        self._text = ('', '')
-        stringtype = fp.read(1)[0]
+        self._text = (u'', u'')
+        stringtype = ord(fp.read(1)[0])
         language = fp.read(3)
         if stringtype in STRING_ENCODINGS:
             text = fp.read()
-            text = _read_id3_string(text, stringtype, '\0')
-            self._text = tuple(text.split('\0'))
+            text = _read_id3_string(text, stringtype, u'\0')
+            self._text = tuple(text.split(u'\0'))
     
     @staticmethod
     def supports(frameid):
-        return frameid.startswith('COM')
+        return frameid.startswith(u'COM')
     
     @property
     def title(self):
-        return self._text[0] if len(self._text) > 0 else ''
+        return self._text[0] if len(self._text) > 0 else u''
     
     @property
     def comment(self):
-        return self._text[1] if len(self._text) > 1 else ''
+        return self._text[1] if len(self._text) > 1 else u''
     
     @property
     def text(self):
@@ -164,19 +165,19 @@ class Id3Frame(object):
             if framedataclass:
                 self._data = framedataclass(self.rawdata)
             else:
-                raise NotImplementedError('Support for frame \'%s\' is not implemented yet' % self.frame_id)
+                raise NotImplementedError(u'Support for frame \'%s\' is not implemented yet' % self.frame_id)
         return self._data
     
 
 class Id3v22Frame(Id3Frame):
     def __init__(self, fp):
-        frame_id = str(fp.read(3), 'ascii', 'replace')
-        size = _read_id3_size(b'\0' + fp.read(3), syncsafe=False)
+        frame_id = unicode(fp.read(3), u'ascii', u'replace')
+        size = _read_id3_size('\0' + fp.read(3), syncsafe=False)
         Id3Frame.__init__(self, fp, frame_id, size)
 
 class Id3v23Frame(Id3Frame):
     def __init__(self, fp, syncsafe):
-        frameid = str(fp.read(4), 'ascii', 'replace')
+        frameid = unicode(fp.read(4), u'ascii', u'replace')
         size = _read_id3_size(fp.read(4), syncsafe=syncsafe)
         flags = fp.read(2)
         Id3Frame.__init__(self, fp, frameid, size)
@@ -215,8 +216,8 @@ class Id3v2(object):
         try:
             return int(track)
         except ValueError:
-            if '/' in track:
-                return self._decode_track(track.split('/')[0])
+            if u'/' in track:
+                return self._decode_track(track.split(u'/')[0])
             else:
                 return 0
     
@@ -250,11 +251,11 @@ class Id3v2(object):
     
     def _get_frame_text(self, frame_id):
         result = self._get_frame_data(frame_id)
-        return getattr(result, 'text', '').strip()
+        return getattr(result, u'text', u'').strip()
     
     def _get_frame_text_line(self, frame_id):
         result = self._get_frame_text(frame_id)
-        return result.replace('\n', ' ').replace('\r', ' ')
+        return result.replace(u'\n', u' ').replace(u'\r', u' ')
     
     #--- Properties
     size = property(lambda self: self._header.tagsize)
@@ -265,27 +266,27 @@ class Id3v2(object):
     
     @property
     def album(self):
-        frame_id = cond(self.version >= 3, 'TALB', 'TAL')
+        frame_id = cond(self.version >= 3, u'TALB', u'TAL')
         return self._get_frame_text_line(frame_id)
     
     @property
     def artist(self):
-        frame_id = cond(self.version >= 3, 'TPE1', 'TP1')
+        frame_id = cond(self.version >= 3, u'TPE1', u'TP1')
         return self._get_frame_text_line(frame_id)
     
     @property
     def comment(self):
-        frame_id = cond(self.version >= 3, 'COMM', 'COM')
+        frame_id = cond(self.version >= 3, u'COMM', u'COM')
         return self._get_frame_text(frame_id)
     
     @property
     def duration(self):
-        s = self._get_frame_text('TLEN')
+        s = self._get_frame_text(u'TLEN')
         return tryint(s) // 1000
     
     @property
     def genre(self):
-        frame_id = cond(self.version >= 3, 'TCON', 'TCO')
+        frame_id = cond(self.version >= 3, u'TCON', u'TCO')
         genre = self._get_frame_text_line(frame_id)
         match = re_numeric_genre.match(genre)
         if match:
@@ -296,17 +297,17 @@ class Id3v2(object):
     
     @property
     def title(self):
-        frame_id = cond(self.version >= 3, 'TIT2', 'TT2')
+        frame_id = cond(self.version >= 3, u'TIT2', u'TT2')
         return self._get_frame_text_line(frame_id)
     
     @property
     def track(self):
-        frame_id = cond(self.version >= 3, 'TRCK', 'TRK')
+        frame_id = cond(self.version >= 3, u'TRCK', u'TRK')
         s = self._get_frame_text_line(frame_id)
         return self._decode_track(s)
     
     @property
     def year(self):
-        frame_id = cond(self.version >= 3, 'TYER', 'TYE')
+        frame_id = cond(self.version >= 3, u'TYER', u'TYE')
         return self._get_frame_text_line(frame_id)
     

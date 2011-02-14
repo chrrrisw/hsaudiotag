@@ -6,6 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+from __future__ import with_statement
 from struct import unpack
 
 from .util import FileOrPath
@@ -37,7 +38,7 @@ class MetaDataBlockHeader(object):
         self.file.seek(self.offset + self.HEADER_SIZE)
         return BLOCK_CLASSES.get(self.type, MetaDataBlock)(self.file, self)
 
-    def __next__(self):
+    def next(self):
         self.file.seek(self.offset + self.HEADER_SIZE + self.size)
         return MetaDataBlockHeader(self.file)
 
@@ -66,7 +67,7 @@ BLOCK_CLASSES = {
 }
 
 class FLAC(object):
-    ID = b'fLaC'
+    ID = 'fLaC'
     def __init__(self, infile):
         with FileOrPath(infile) as fp:
             fp.seek(0, 2)
@@ -80,12 +81,12 @@ class FLAC(object):
     def _empty(self):
         self.valid = False
         self.bitrate = 0
-        self.artist = ''
-        self.album = ''
-        self.title = ''
-        self.genre = ''
-        self.year = ''
-        self.comment = ''
+        self.artist = u''
+        self.album = u''
+        self.title = u''
+        self.genre = u''
+        self.year = u''
+        self.comment = u''
         self.track = 0
         self.sample_rate = 0
         self.sample_count = 0
@@ -125,12 +126,12 @@ class FLAC(object):
         while header.valid:
             if header.type == type:
                 return header.data()
-            header = next(header)
+            header = header.next()
     
     def get_last_block(self):
         header = self.first_header
         while header.valid:
             if header.last_before_audio:
                 return header
-            header = next(header)
+            header = header.next()
     
