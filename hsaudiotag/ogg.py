@@ -44,7 +44,10 @@ class VorbisPage:
 class VorbisComment:
     def __init__(self, data):
         def get_field(field_name):
-            data = meta_data.get(field_name, b'')
+            try:
+                data = meta_data[field_name]
+            except KeyError:
+                data = meta_data.get(field_name.lower(), b'')
             return str(data, 'utf-8')
         
         [vendor_string_length] = unpack('<I', data[:4])

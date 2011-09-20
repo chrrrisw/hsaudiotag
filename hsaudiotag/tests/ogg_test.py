@@ -71,6 +71,13 @@ def test_file_valid_on_test2():
     eq_(0xf79, o.audio_offset)
     eq_(103168 - 0xf79, o.audio_size)
 
+def test_lowercase_fieldnames():
+    # Support ogg files with lowercase fieldnames (artist, album, etc.)
+    o = ogg.Vorbis(TestData.filepath('ogg/lowercase.ogg'))
+    eq_(o.artist, 'The White Stripes')
+    eq_(o.album, 'The White Stripes')
+    eq_(o.title, 'Astro')
+
 def verify_emptyness(o):
     eq_(0, o.bitrate)
     eq_(0, o.sample_rate)
