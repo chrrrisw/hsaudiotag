@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 1.1.2 -- 2011/09/29
+---------------------------
+
+* Fixed a bug preventing some OGG metadata from being read.
+
 Version 1.1.1 -- 2011/01/31
 ---------------------------
 
