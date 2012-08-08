@@ -78,6 +78,15 @@ def test_lowercase_fieldnames():
     eq_(o.album, 'The White Stripes')
     eq_(o.title, 'Astro')
 
+def test_track_with_slash():
+    # A track number field with a slash (for example, 1/20) is supported and will return the first
+    # number of the field.
+    # FILE NOTE: Because I had added 4 bytes to the TRACKNUMBER field in the test file and that I
+    # wasn't sure where I had to adjust the vorbis comment offset other than just in front of the
+    # field, I removed 4 bytes in the otherwise unused TRACKTOTAL (now TRACKT) field.
+    o = ogg.Vorbis(TestData.filepath('ogg/track_with_slash.ogg'))
+    eq_(o.track, 18)
+
 def verify_emptyness(o):
     eq_(0, o.bitrate)
     eq_(0, o.sample_rate)

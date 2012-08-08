@@ -7,8 +7,11 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 from struct import unpack
+import re
 
 from .util import FileOrPath
+
+RE_STARTS_WITH_DIGIT = re.compile(r"^\d+")
 
 class InvalidFileError(Exception):
     pass
@@ -65,7 +68,9 @@ class VorbisComment:
         self.album = get_field(b'ALBUM')
         self.title = get_field(b'TITLE')
         self.genre = get_field(b'GENRE')
-        self.track = int(meta_data.get(b'TRACKNUMBER', 0))
+        track_str = get_field(b'TRACKNUMBER')
+        m = RE_STARTS_WITH_DIGIT.match(track_str)
+        self.track = int(m.group(0)) if m else 0
         self.comment = get_field(b'COMMENT')
         self.year = get_field(b'DATE')
         if not self.year:
