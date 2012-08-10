@@ -11,7 +11,7 @@ LONG_DESC = open('README', 'rt').read() + '\n\n' + open('CHANGES', 'rt').read()
 
 setup(
     name='hsaudiotag3k',
-    version='1.1.2',
+    version='1.1.3',
     author='Hardcoded Software',
     author_email='hsoft@hardcoded.net',
     packages=['hsaudiotag'],
