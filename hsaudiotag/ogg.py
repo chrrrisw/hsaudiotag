@@ -146,10 +146,11 @@ class Vorbis:
         
         #Seek last page to get sample count. It's impossible to not have at least one page in
         #the last 64kb.
-        fp.seek(-0x10000, 2)
+        SEEK_OFFSET = min(0x10000, self.size)
+        fp.seek(-SEEK_OFFSET, 2)
         last_data = fp.read()
         last_offset = last_data.rfind(VorbisPage.OGG_PAGE_ID)
-        to_seek = 0x10000 - last_offset
+        to_seek = SEEK_OFFSET - last_offset
         fp.seek(-to_seek, 2)
         page = VorbisPage(fp)
         if not page.valid:

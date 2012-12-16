@@ -87,6 +87,12 @@ def test_track_with_slash():
     o = ogg.Vorbis(TestData.filepath('ogg/track_with_slash.ogg'))
     eq_(o.track, 18)
 
+def test_small():
+    # Previously, a small (<64kb) OGG file couldn't be read due to a hardcoded 64kb offset. Tix #2.
+    o = ogg.Vorbis(TestData.filepath('ogg/small.ogg'))
+    eq_(o.bitrate, 60)
+    eq_(o.duration, 4)
+
 def verify_emptyness(o):
     eq_(0, o.bitrate)
     eq_(0, o.sample_rate)
