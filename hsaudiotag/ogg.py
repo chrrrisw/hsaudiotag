@@ -8,8 +8,11 @@
 
 from __future__ import with_statement
 from struct import unpack
+import re
 
 from .util import FileOrPath
+
+RE_STARTS_WITH_DIGIT = re.compile(r"^\d+")
 
 class InvalidFileError(Exception):
     pass
@@ -45,8 +48,11 @@ class VorbisPage(object):
 class VorbisComment(object):
     def __init__(self, data):
         def get_field(field_name):
-            data = meta_data.get(field_name, '')
-            return unicode(data, u'utf-8')
+            try:
+                data = meta_data[field_name]
+            except KeyError:
+                data = meta_data.get(field_name.lower(), b'')
+            return unicode(data, 'utf-8')
         
         [vendor_string_length] = unpack('<I', data[:4])
         meta_data_offset = vendor_string_length + 4
@@ -59,13 +65,15 @@ class VorbisComment(object):
             splitted = value.split('=')
             meta_data[splitted[0]] = splitted[1]
             offset += length + 4
-        self.artist = get_field('ARTIST')
-        self.album = get_field('ALBUM')
-        self.title = get_field('TITLE')
-        self.genre = get_field('GENRE')
-        self.track = int(meta_data.get('TRACKNUMBER', 0))
-        self.comment = get_field('COMMENT')
-        self.year = get_field('DATE')
+        self.artist = get_field(b'ARTIST')
+        self.album = get_field(b'ALBUM')
+        self.title = get_field(b'TITLE')
+        self.genre = get_field(b'GENRE')
+        track_str = get_field(b'TRACKNUMBER')
+        m = RE_STARTS_WITH_DIGIT.match(track_str)
+        self.track = int(m.group(0)) if m else 0
+        self.comment = get_field(b'COMMENT')
+        self.year = get_field(b'DATE')
         if not self.year:
             description = get_field('DESCRIPTION')
             if u'YEAR: ' in description:
@@ -139,10 +147,11 @@ class Vorbis(object):
         
         #Seek last page to get sample count. It's impossible to not have at least one page in
         #the last 64kb.
-        fp.seek(-0x10000, 2)
+        SEEK_OFFSET = min(0x10000, self.size)
+        fp.seek(-SEEK_OFFSET, 2)
         last_data = fp.read()
         last_offset = last_data.rfind(VorbisPage.OGG_PAGE_ID)
-        to_seek = 0x10000 - last_offset
+        to_seek = SEEK_OFFSET - last_offset
         fp.seek(-to_seek, 2)
         page = VorbisPage(fp)
         if not page.valid:

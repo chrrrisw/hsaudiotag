@@ -72,6 +72,28 @@ def test_file_valid_on_test2():
     eq_(0xf79, o.audio_offset)
     eq_(103168 - 0xf79, o.audio_size)
 
+def test_lowercase_fieldnames():
+    # Support ogg files with lowercase fieldnames (artist, album, etc.)
+    o = ogg.Vorbis(TestData.filepath('ogg/lowercase.ogg'))
+    eq_(o.artist, 'The White Stripes')
+    eq_(o.album, 'The White Stripes')
+    eq_(o.title, 'Astro')
+
+def test_track_with_slash():
+    # A track number field with a slash (for example, 1/20) is supported and will return the first
+    # number of the field.
+    # FILE NOTE: Because I had added 4 bytes to the TRACKNUMBER field in the test file and that I
+    # wasn't sure where I had to adjust the vorbis comment offset other than just in front of the
+    # field, I removed 4 bytes in the otherwise unused TRACKTOTAL (now TRACKT) field.
+    o = ogg.Vorbis(TestData.filepath('ogg/track_with_slash.ogg'))
+    eq_(o.track, 18)
+
+def test_small():
+    # Previously, a small (<64kb) OGG file couldn't be read due to a hardcoded 64kb offset. Tix #2.
+    o = ogg.Vorbis(TestData.filepath('ogg/small.ogg'))
+    eq_(o.bitrate, 60)
+    eq_(o.duration, 4)
+
 def verify_emptyness(o):
     eq_(0, o.bitrate)
     eq_(0, o.sample_rate)
