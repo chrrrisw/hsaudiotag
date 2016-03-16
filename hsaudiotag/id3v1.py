@@ -2,8 +2,8 @@
 # Created On: 2004/12/07
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 
-# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
-# which should be included with this package. The terms are also available at 
+# This software is licensed under the "BSD" License as described in the "LICENSE" file,
+# which should be included with this package. The terms are also available at
 # http://www.hardcoded.net/licenses/bsd_license
 
 import struct
@@ -25,7 +25,7 @@ TAG_VERSION_1_1 = 2
 
 def _arrange_id3_field(raw_field):
     """Format the read field properly
-    
+
     This function takes only the part of the string before the first \0 char.
     After this, it checks if the string has to be converted to unicode and convert it if it indeed does.
     """
@@ -47,17 +47,18 @@ class Id3v1(object):
         self.year = ''
         self.genre = ''
         self.comment = ''
+        self.part_of_set = 0
         self.track = 0
         with FileOrPath(infile) as fp:
             self._read_file(fp)
-    
+
     def _read_file(self, fp):
         fp.seek(0, 2)
         position = fp.tell()
         if position and position >= 128:
             fp.seek(-128, 2)
             self._read_tag(fp.read(128))
-    
+
     def _read_tag(self, data):
         if data[0:3] != b'TAG':
             return
@@ -78,8 +79,8 @@ class Id3v1(object):
         genre = data[127]
         self.genre = genre_by_index(genre)
         self.size = 128
-    
+
     @property
     def exists(self):
         return self.size > 0
-    
+
