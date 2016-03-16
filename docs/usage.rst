@@ -1,3 +1,4 @@
+================
 Using hsaudiotag
 ================
 
@@ -44,12 +45,12 @@ The ``mpeg.Mpeg`` and ``aiff.File`` classes are special cases where tags are con
 Available classes
 =================
 
-* ``mpeg.Mpeg`` for mp3 files.
-* ``mp4.File`` for mp4 files.
-* ``wma.WMADecoder`` for wma files.
-* ``ogg.Vorbis`` for ogg files.
-* ``flac.FLAC`` for flac files.
-* ``aiff.File`` for aiff files.
+* :class:`hsaudiotag.mpeg.Mpeg` for mp3 files.
+* :class:`hsaudiotag.mp4.File` for mp4 files.
+* :class:`hsaudiotag.wma.WMADecoder` for wma files.
+* :class:`hsaudiotag.ogg.Vorbis` for ogg files.
+* :class:`hsaudiotag.flac.FLAC` for flac files.
+* :class:`hsaudiotag.aiff.File` for aiff files.
 
 auto.File
 =========

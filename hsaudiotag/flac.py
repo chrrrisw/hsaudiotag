@@ -18,11 +18,14 @@ SEEKTABLE = 3
 VORBIS_COMMENT = 4
 CUESHEET = 5
 
+
 class InvalidFileError(Exception):
     pass
 
+
 class MetaDataBlockHeader(object):
     HEADER_SIZE = 4
+
     def __init__(self, infile):
         self.file = infile
         self.offset = infile.tell()
@@ -31,7 +34,7 @@ class MetaDataBlockHeader(object):
         self.last_before_audio = bool(unpacked >> 31)
         self.type = (unpacked >> 24) & 0x7f
         self.size = unpacked & 0xffffff
-        self.valid = self.type != 0x7f #invalid type
+        self.valid = self.type != 0x7f  # invalid type
 
     def data(self):
         self.file.seek(self.offset + self.HEADER_SIZE)
@@ -40,6 +43,7 @@ class MetaDataBlockHeader(object):
     def __next__(self):
         self.file.seek(self.offset + self.HEADER_SIZE + self.size)
         return MetaDataBlockHeader(self.file)
+
 
 class MetaDataBlock(object):
     def __init__(self, infile, header):
@@ -65,8 +69,10 @@ BLOCK_CLASSES = {
     VORBIS_COMMENT: VorbisComment,
 }
 
+
 class FLAC(object):
     ID = b'fLaC'
+
     def __init__(self, infile):
         with FileOrPath(infile) as fp:
             fp.seek(0, 2)
@@ -74,7 +80,7 @@ class FLAC(object):
             fp.seek(0, 0)
             try:
                 self._read(fp)
-            except Exception: #The unpack error doesn't seem to have a class. I have to catch all here
+            except Exception:  # The unpack error doesn't seem to have a class. I have to catch all here
                 self._empty()
 
     def _empty(self):
@@ -134,4 +140,3 @@ class FLAC(object):
             if header.last_before_audio:
                 return header
             header = next(header)
-

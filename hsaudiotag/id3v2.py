@@ -245,7 +245,7 @@ class Id3v2(object):
             self.frames[frame.frame_id] = frame
             frame = self._get_frame(fp)
         if (self._last_read_frame is not None) and (self._last_read_frame.size > 0x7f) and \
-            (not self._had_large_frame) and (self.version == 4):
+                (not self._had_large_frame) and (self.version == 4):
             # probably needs a itunes hack, in any case, this is the first large frame,
             # re-reading can't hurt.
             self._header.vmajor = 3
@@ -324,4 +324,3 @@ class Id3v2(object):
         s = self._get_frame_text_line(frame_id)
         # Part Of Set has the same formatting rules as Track number
         return self._decode_track(s)
-

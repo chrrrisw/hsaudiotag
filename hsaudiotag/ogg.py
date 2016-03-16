@@ -62,8 +62,8 @@ class VorbisComment:
         meta_data = {}
         offset = meta_data_offset + 4
         for _ in range(meta_count):
-            [length] = unpack('<I', data[offset:offset+4])
-            value = data[offset+4:offset+length+4]
+            [length] = unpack('<I', data[offset:offset + 4])
+            value = data[offset + 4:offset + length + 4]
             splitted = value.split(b'=')
             meta_data[splitted[0]] = splitted[1]
             offset += length + 4
@@ -80,7 +80,7 @@ class VorbisComment:
             description = get_field(b'DESCRIPTION')
             if 'YEAR: ' in description:
                 index = description.find('YEAR: ')
-                self.year = description[index+6:index+10]
+                self.year = description[index + 6:index + 10]
 
 
 class Vorbis:

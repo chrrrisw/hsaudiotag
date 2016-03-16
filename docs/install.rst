@@ -1,3 +1,7 @@
+============
+Installation
+============
+
 Dependencies
 ============
 
@@ -12,4 +16,8 @@ It's a standard Distribute package, just do::
 
 or if you haven't downloaded it yet::
 
-    pip install hsaudiotag
+    pip install hsaudiotag (Python 2.x)
+
+    or
+
+    pip install hsaudiotag3k (Python 3.x)
