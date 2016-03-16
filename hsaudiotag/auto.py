@@ -17,7 +17,6 @@ ALL_CLASSES = [
     mpeg.Mpeg,
     ogg.Vorbis,
     wma.WMADecoder]
-"""All classes covered by the auto class"""
 
 EXT2CLASS = {
     'mp3': mpeg.Mpeg,
@@ -30,7 +29,6 @@ EXT2CLASS = {
     'aiff': aiff.File,
     'aifc': aiff.File,
 }
-"""Mapping of file extension to class."""
 
 AUDIO_ATTRS = {
     'size',
@@ -49,7 +47,6 @@ TAG_ATTRS = {
     'track',
     'comment',
     'part_of_set'}
-"""The tags available."""
 
 
 class File:

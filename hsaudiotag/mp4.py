@@ -229,6 +229,7 @@ ATOM_SPECS = {
     '©cmt': AttributeAtom,
     '©gen': AttributeAtom,
     'data': AttributeDataAtom,
+    'disk': AttributeAtom,
     'esds': EsdsAtom,
     'gnre': GnreAtom,
     'ilst': AtomBox,
@@ -311,6 +312,10 @@ class File(AtomBox):
             return genre_by_index(data - 1)
         else:
             return ''
+
+    @property
+    def part_of_set(self):
+        return tryint(self._get_attr('moov.udta.meta.ilst.disk'))
 
     @property
     def sample_rate(self):
