@@ -46,3 +46,16 @@ def tryint(value, default=0):
         return int(value)
     except (TypeError, ValueError):
         return default
+
+
+def x_from_x_of_y(x_of_y, default=0):
+    '''
+    Returns an integer X from a string of the form X/Y.
+    '''
+    try:
+        return int(x_of_y)
+    except ValueError:
+        if '/' in x_of_y:
+            return x_from_x_of_y(x_of_y.split('/')[0], default)
+        else:
+            return default

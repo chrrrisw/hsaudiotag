@@ -314,13 +314,13 @@ class Id3v2(object):
         return self._decode_track(s)
 
     @property
-    def year(self):
-        frame_id = cond(self.version >= 3, 'TYER', 'TYE')
-        return self._get_frame_text_line(frame_id)
-
-    @property
     def part_of_set(self):
         frame_id = cond(self.version >= 3, 'TPOS', 'TPA')
         s = self._get_frame_text_line(frame_id)
         # Part Of Set has the same formatting rules as Track number
         return self._decode_track(s)
+
+    @property
+    def year(self):
+        frame_id = cond(self.version >= 3, 'TYER', 'TYE')
+        return self._get_frame_text_line(frame_id)

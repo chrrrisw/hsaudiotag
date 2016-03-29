@@ -314,10 +314,6 @@ class File(AtomBox):
             return ''
 
     @property
-    def part_of_set(self):
-        return tryint(self._get_attr('moov.udta.meta.ilst.disk'))
-
-    @property
     def sample_rate(self):
         atom = self.find('moov.trak.mdia.mdhd')
         return atom.sample_rate if atom else 0
@@ -329,6 +325,10 @@ class File(AtomBox):
     @property
     def track(self):
         return tryint(self._get_attr('moov.udta.meta.ilst.trkn'))
+
+    @property
+    def part_of_set(self):
+        return tryint(self._get_attr('moov.udta.meta.ilst.disk'))
 
     @property
     def valid(self):
