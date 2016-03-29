@@ -1,11 +1,14 @@
 Source Documentation
 ====================
 
+Contents
+--------
+
 .. toctree::
    :maxdepth: 1
    :glob:
 
-   hsaudiotag*
+   api/*
 
 Indices
 -------
