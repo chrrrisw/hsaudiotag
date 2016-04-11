@@ -2,8 +2,8 @@
 # Created On: 2008-09-09
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 
-# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
-# which should be included with this package. The terms are also available at 
+# This software is licensed under the "BSD" License as described in the "LICENSE" file,
+# which should be included with this package. The terms are also available at
 # http://www.hardcoded.net/licenses/bsd_license
 
 # http://www.cnpbagwell.com/aiff-c.txt
@@ -17,12 +17,15 @@ from .util import FileOrPath
 
 HEADER_SIZE = 8
 
+
 class NotAChunk(Exception):
     pass
 
 # based on stdlib's aifc
 _HUGE_VAL = 1.79769313486231e+308
-def read_float(s): # 10 bytes
+
+
+def read_float(s):  # 10 bytes
     expon, himant, lomant = struct.unpack('>hLL', s)
     sign = 1
     if expon < 0:
@@ -37,6 +40,7 @@ def read_float(s): # 10 bytes
         f = (himant * 0x100000000 + lomant) * pow(2.0, expon - 63)
     return sign * f
 
+
 class Chunk:
     def __init__(self, fp):
         self._fp = fp
@@ -48,11 +52,11 @@ class Chunk:
         if self.size <= 0:
             raise NotAChunk()
         self.data = None
-    
+
     def read(self):
         self._fp.seek(self.position + HEADER_SIZE)
         self.data = self._fp.read(self.size)
-    
+
 
 class File(Chunk):
     def __init__(self, infile):
@@ -66,7 +70,7 @@ class File(Chunk):
                 self.valid = self.duration > 0
             except NotAChunk:
                 return
-    
+
     def read(self):
         # the FORM chunk (the main chunk) has 4 bytes for the type, then the subchunks
         self._fp.seek(4, 1)
@@ -92,4 +96,3 @@ class File(Chunk):
                 self.audio_offset = chunk.position + HEADER_SIZE
                 self.audio_size = chunk.size
             self._fp.seek(chunk.position + HEADER_SIZE + chunk.size)
-    
