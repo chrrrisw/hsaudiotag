@@ -2,11 +2,9 @@
 # Created On: 2004/12/07
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 
-# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
-# which should be included with this package. The terms are also available at 
+# This software is licensed under the "BSD" License as described in the "LICENSE" file,
+# which should be included with this package. The terms are also available at
 # http://www.hardcoded.net/licenses/bsd_license
-
-import struct
 
 from .util import FileOrPath
 from .genres import genre_by_index
@@ -14,18 +12,19 @@ from .genres import genre_by_index
 TAG_VERSION_1_0 = 1
 TAG_VERSION_1_1 = 2
 
-#id3v1 specs
-#0-2:"TAG"
-#3-32:Title
-#33-62:Artist
-#63-92:Album
-#93-96:Year
-#97-126:Comment
-#127:Genre
+# id3v1 specs
+# 0-2:"TAG"
+# 3-32:Title
+# 33-62:Artist
+# 63-92:Album
+# 93-96:Year
+# 97-126:Comment
+# 127:Genre
+
 
 def _arrange_id3_field(raw_field):
     """Format the read field properly
-    
+
     This function takes only the part of the string before the first \0 char.
     After this, it checks if the string has to be converted to unicode and convert it if it indeed does.
     """
@@ -36,6 +35,7 @@ def _arrange_id3_field(raw_field):
     else:
         result = ''
     return result
+
 
 class Id3v1(object):
     def __init__(self, infile):
@@ -51,20 +51,20 @@ class Id3v1(object):
         self.disc = 0
         with FileOrPath(infile) as fp:
             self._read_file(fp)
-    
+
     def _read_file(self, fp):
         fp.seek(0, 2)
         position = fp.tell()
         if position and position >= 128:
             fp.seek(-128, 2)
             self._read_tag(fp.read(128))
-    
+
     def _read_tag(self, data):
         if data[0:3] != b'TAG':
             return
-        #check if the comment field contains track info
+        # check if the comment field contains track info
         if ((data[125] == 0) and (data[126] != 0)) or ((data[125] == 0x20) and (data[126] != 0x20)):
-            #We have a v1.1
+            # We have a v1.1
             self.version = TAG_VERSION_1_1
             self.track = min(data[126], 99)
             self.comment = _arrange_id3_field(data[97:125])
@@ -79,8 +79,7 @@ class Id3v1(object):
         genre = data[127]
         self.genre = genre_by_index(genre)
         self.size = 128
-    
+
     @property
     def exists(self):
         return self.size > 0
-    

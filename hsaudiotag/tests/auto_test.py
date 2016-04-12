@@ -1,19 +1,21 @@
 # Created By: Virgil Dupras
 # Created On: 2010-12-28
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
-# 
-# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
-# which should be included with this package. The terms are also available at 
+#
+# This software is licensed under the "BSD" License as described in the "LICENSE" file,
+# which should be included with this package. The terms are also available at
 # http://www.hardcoded.net/licenses/bsd_license
 
 from .. import auto, mp4
 from .squeeze import expand_mp4, expand_mpeg
 from .util import TestData, eq_
 
+
 def test_invalid():
     # An invalid file is correctly detected as such
     f = auto.File(TestData.filepath('randomfile'))
     assert not f.valid
+
 
 def test_mpeg():
     # auto.File can detect mpeg files.
@@ -34,6 +36,7 @@ def test_mpeg():
     eq_(f.track, 1)
     eq_(f.disc, 0)
 
+
 def test_mp4():
     # auto.File can detect mp4 files.
     f = auto.File(expand_mp4(TestData.filepath('mp4/test1.m4a')))
@@ -50,6 +53,7 @@ def test_mp4():
     eq_(f.year, '2003')
     eq_(f.track, 1)
     eq_(f.disc, 0)
+
 
 def test_wma():
     # auto.File can detect wma files.
@@ -68,6 +72,7 @@ def test_wma():
     eq_(f.duration, 239)
     eq_(f.audio_offset, 0x15a0)
     eq_(f.audio_size, 0x582682 - 0x15a0)
+
 
 def test_ogg():
     # auto.File can detect ogg files.
@@ -88,6 +93,7 @@ def test_ogg():
     eq_(f.audio_offset, 0x1158)
     eq_(f.audio_size, 101785 - 0x1158)
 
+
 def test_flac():
     # auto.File can detect flac files.
     f = auto.File(TestData.filepath('flac/test1.flac'))
@@ -106,6 +112,7 @@ def test_flac():
     eq_(f.audio_offset, 0x1190)
     eq_(f.audio_size, 123619 - 0x1190)
 
+
 def test_aiff():
     # auto.File can detect aiff files.
     f = auto.File(TestData.filepath('aiff/with_id3.aif'))
@@ -118,18 +125,21 @@ def test_aiff():
     eq_(f.audio_offset, 46)
     eq_(f.audio_size, 42)
 
+
 def test_aiff_without_tag():
     # We don't crash on AIFF files without tags.
-    f = auto.File(TestData.filepath('aiff/without_id3.aif')) # no crash
+    f = auto.File(TestData.filepath('aiff/without_id3.aif'))  # no crash
     assert f.valid
     eq_(f.duration, 132)
     eq_(f.artist, '')
     eq_(f.track, 0)
     eq_(f.disc, 0)
 
+
 def test_close_is_called_on_mp4(monkeypatch):
     # The mp4 file has to be closed after being read.
     closed = False
+
     def mock_close(self):
         nonlocal closed
         closed = True

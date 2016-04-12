@@ -2,12 +2,13 @@
 # Created On: 2005/12/16
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 
-# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
-# which should be included with this package. The terms are also available at 
+# This software is licensed under the "BSD" License as described in the "LICENSE" file,
+# which should be included with this package. The terms are also available at
 # http://www.hardcoded.net/licenses/bsd_license
 
 from .. import ogg
 from .util import TestData, eq_
+
 
 def test_page_valid_on_test1():
     fp = open(TestData.filepath('ogg/test1.ogg'), 'rb')
@@ -35,7 +36,7 @@ def test_page_valid_on_test1():
     eq_(0x2800, page.position)
     eq_(0x1019, page.size)
     fp.close()
-    
+
 
 def test_file_valid_on_test1():
     o = ogg.Vorbis(TestData.filepath('ogg/test1.ogg'))
@@ -55,6 +56,7 @@ def test_file_valid_on_test1():
     eq_(o.audio_offset, 0x1158)
     eq_(o.audio_size, 101785 - 0x1158)
 
+
 def test_file_valid_on_test2():
     o = ogg.Vorbis(TestData.filepath('ogg/test2.ogg'))
     eq_(103168, o.size)
@@ -73,12 +75,14 @@ def test_file_valid_on_test2():
     eq_(0xf79, o.audio_offset)
     eq_(103168 - 0xf79, o.audio_size)
 
+
 def test_lowercase_fieldnames():
     # Support ogg files with lowercase fieldnames (artist, album, etc.)
     o = ogg.Vorbis(TestData.filepath('ogg/lowercase.ogg'))
     eq_(o.artist, 'The White Stripes')
     eq_(o.album, 'The White Stripes')
     eq_(o.title, 'Astro')
+
 
 def test_track_with_slash():
     # A track number field with a slash (for example, 1/20) is supported and will return the first
@@ -89,11 +93,13 @@ def test_track_with_slash():
     o = ogg.Vorbis(TestData.filepath('ogg/track_with_slash.ogg'))
     eq_(o.track, 18)
 
+
 def test_small():
     # Previously, a small (<64kb) OGG file couldn't be read due to a hardcoded 64kb offset. Tix #2.
     o = ogg.Vorbis(TestData.filepath('ogg/small.ogg'))
     eq_(o.bitrate, 60)
     eq_(o.duration, 4)
+
 
 def verify_emptyness(o):
     eq_(0, o.bitrate)
@@ -111,27 +117,32 @@ def verify_emptyness(o):
     eq_(0, o.audio_offset)
     eq_(0, o.audio_size)
 
+
 def test_invalid_zerofile():
     o = ogg.Vorbis(TestData.filepath('zerofile'))
     verify_emptyness(o)
+
 
 def test_invalid_zerofill():
     o = ogg.Vorbis(TestData.filepath('zerofill'))
     verify_emptyness(o)
 
+
 def test_invalid_randomfile():
     o = ogg.Vorbis(TestData.filepath('randomfile'))
     verify_emptyness(o)
+
 
 def test_invalid_mp3():
     o = ogg.Vorbis(TestData.filepath('mpeg/test1.mp3'))
     verify_emptyness(o)
 
+
 def test_invalid_wma():
     o = ogg.Vorbis(TestData.filepath('wma/test1.wma'))
     verify_emptyness(o)
 
+
 def test_invalid_mp4():
     o = ogg.Vorbis(TestData.filepath('mp4/test1.m4a'))
     verify_emptyness(o)
-

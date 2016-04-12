@@ -25,9 +25,9 @@ setup(
     long_description=LONG_DESC,
     classifiers=CLASSIFIERS,
     command_options={
-       'build_sphinx': {
-           'version': ('setup.py', VERSION),
-           'release': ('setup.py', VERSION),
+        'build_sphinx': {
+            'version': ('setup.py', VERSION),
+            'release': ('setup.py', VERSION),
         }
     },
 )
