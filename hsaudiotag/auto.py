@@ -71,6 +71,6 @@ class File:
         for attrname in AUDIO_ATTRS:
             setattr(self, attrname, 0)
         for attrname in TAG_ATTRS:
-            default = '' if attrname != 'track' else 0
+            default = '' if attrname not in ['track', 'disc'] else 0
             setattr(self, attrname, default)
     
