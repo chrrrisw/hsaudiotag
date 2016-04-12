@@ -35,6 +35,7 @@ def test_with_id3():
     eq_(f.sample_rate, 44100)
     eq_(f.bitrate, 1411200)
     eq_(f.tag.artist, 'Assimil') # The id3v2 module takes care of it, no need to test it further
+    eq_(f.tag.disc, 4)
     eq_(f.audio_offset, 46)
     eq_(f.audio_size, 42)
 

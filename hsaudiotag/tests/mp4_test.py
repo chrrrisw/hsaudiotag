@@ -405,6 +405,7 @@ class TestMp4FileTest1:
         eq_(128,self.file.bitrate)
         eq_('2003',self.file.year)
         eq_(1,self.file.track)
+        eq_(0, self.file.disc)
         self.file.close() #See if there is something wrong happenning when calling close twice
 
     def test_cant_open(self):
@@ -466,6 +467,9 @@ class TestMp4Fileinvalid1:
         
     def test_track_is_int(self):
         eq_(0,self.file.track)
+
+    def test_disc_is_int(self):
+        eq_(0, self.file.disc)
 
 def test_file_test2():
     f = mp4.File(TestData.filepath('mp4/test2.m4a'))

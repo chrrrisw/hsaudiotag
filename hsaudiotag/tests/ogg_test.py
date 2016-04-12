@@ -51,6 +51,7 @@ def test_file_valid_on_test1():
     eq_(o.comment, '')
     eq_(o.year, '1999')
     eq_(o.track, 8)
+    eq_(o.disc, 0)
     eq_(o.audio_offset, 0x1158)
     eq_(o.audio_size, 101785 - 0x1158)
 
@@ -68,6 +69,7 @@ def test_file_valid_on_test2():
     eq_('', o.comment)
     eq_('2005', o.year)
     eq_(3, o.track)
+    eq_(0, o.disc)
     eq_(0xf79, o.audio_offset)
     eq_(103168 - 0xf79, o.audio_size)
 
@@ -105,6 +107,7 @@ def verify_emptyness(o):
     eq_('', o.comment)
     eq_('', o.year)
     eq_(0, o.track)
+    eq_(0, o.disc)
     eq_(0, o.audio_offset)
     eq_(0, o.audio_size)
 

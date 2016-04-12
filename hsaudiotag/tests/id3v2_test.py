@@ -22,6 +22,7 @@ def testNormal():
     eq_(tag.year,'2001')
     eq_(tag.genre,'Latin')
     eq_(tag.comment,'http://www.EliteMP3.ws')
+    eq_(tag.disc, 0)
 
 def testNotag():
     tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/notag.mp3')))
@@ -43,6 +44,7 @@ Enjoy your copy of MusicMatch Jukebox!"""
     eq_(tag.album,'Mellow Down Easy')
     eq_(tag.year,'')
     eq_(tag.genre,'Blues')
+    eq_(tag.disc, 0)
 
 def testOzzy():
     tag = Id3v2(TestData.filepath('id3v2/ozzy.tag'))
@@ -53,6 +55,7 @@ def testOzzy():
     eq_(tag.genre,'Metal')
     eq_(tag.comment,'None')
     eq_(tag.track,1)
+    eq_(tag.disc, 0)
 
 def testUnicode():
     tag = Id3v2(TestData.filepath('id3v2/230-unicode.tag'))

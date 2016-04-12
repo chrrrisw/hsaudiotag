@@ -32,6 +32,7 @@ def test_mpeg():
     eq_(f.year, '2001')
     eq_(f.comment, '0000039F 000003E6 00001D0B 000021C7 000111B5 000111B5 00007545 00008000 0000EA60 0000EA60')
     eq_(f.track, 1)
+    eq_(f.disc, 0)
 
 def test_mp4():
     # auto.File can detect mp4 files.
@@ -48,6 +49,7 @@ def test_mp4():
     eq_(f.bitrate, 128)
     eq_(f.year, '2003')
     eq_(f.track, 1)
+    eq_(f.disc, 0)
 
 def test_wma():
     # auto.File can detect wma files.
@@ -60,6 +62,7 @@ def test_wma():
     eq_(f.comment, '')
     eq_(f.year, '2000')
     eq_(f.track, 1)
+    eq_(f.disc, 0)
     eq_(f.bitrate, 192)
     eq_(f.size, 77051)
     eq_(f.duration, 239)
@@ -81,6 +84,7 @@ def test_ogg():
     eq_(f.comment, '')
     eq_(f.year, '1999')
     eq_(f.track, 8)
+    eq_(f.disc, 0)
     eq_(f.audio_offset, 0x1158)
     eq_(f.audio_size, 101785 - 0x1158)
 
@@ -95,6 +99,7 @@ def test_flac():
     eq_(f.title, 'Country Line')
     eq_(f.album, 'it takes a thief')
     eq_(f.track, 2)
+    eq_(f.disc, 1)
     eq_(f.comment, 'It sucks')
     eq_(f.year, '1994')
     eq_(f.genre, 'Hip-Hop')
@@ -109,6 +114,7 @@ def test_aiff():
     eq_(f.sample_rate, 44100)
     eq_(f.bitrate, 1411200)
     eq_(f.artist, 'Assimil')
+    eq_(f.disc, 4)
     eq_(f.audio_offset, 46)
     eq_(f.audio_size, 42)
 
@@ -119,6 +125,7 @@ def test_aiff_without_tag():
     eq_(f.duration, 132)
     eq_(f.artist, '')
     eq_(f.track, 0)
+    eq_(f.disc, 0)
 
 def test_close_is_called_on_mp4(monkeypatch):
     # The mp4 file has to be closed after being read.

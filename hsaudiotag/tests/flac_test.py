@@ -80,6 +80,7 @@ def test_valid_vorbis_comment():
     eq_('Country Line', comment.title)
     eq_('it takes a thief', comment.album)
     eq_(2, comment.track)
+    eq_(1, comment.disc)
     eq_('It sucks', comment.comment)
     eq_('1994', comment.year)
     eq_('Hip-Hop', comment.genre)
@@ -96,6 +97,7 @@ def test_test1():
     eq_(f.title, 'Country Line')
     eq_(f.album, 'it takes a thief')
     eq_(f.track, 2)
+    eq_(f.disc, 1)
     eq_(f.comment, 'It sucks')
     eq_(f.year, '1994')
     eq_(f.genre, 'Hip-Hop')
@@ -114,6 +116,7 @@ def verify_emptyness(f):
     eq_('', f.comment)
     eq_('', f.year)
     eq_(0, f.track)
+    eq_(0, f.disc)
     eq_(0, f.audio_offset)
     eq_(0, f.audio_size)
 
