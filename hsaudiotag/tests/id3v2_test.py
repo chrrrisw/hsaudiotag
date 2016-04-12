@@ -122,16 +122,6 @@ def test_TLEN():
     tag = Id3v2(TestData.filepath('mpeg/test8.mp3'))
     eq_(tag.duration,299)
 
-def test_DecodeTrack():
-    tag = Id3v2(TestData.filepath('zerofile'))
-    method = tag._decode_track
-    eq_(42,method('42'))
-    eq_(0,method(''))
-    eq_(12,method('12/24'))
-    eq_(0,method(' '))
-    eq_(0,method('/'))
-    eq_(0,method('foo/12'))
-
 def test_Decodeduration():
     tag = Id3v2(TestData.filepath('zerofile'))
     tag._get_frame_text = lambda _:'4200'

@@ -10,7 +10,7 @@ import io
 import struct
 import re
 
-from .util import cond, tryint, FileOrPath
+from .util import cond, tryint, FileOrPath, x_from_x_of_y
 from .genres import genre_by_index
 
 ID_ID3 = b'ID3'
@@ -209,17 +209,6 @@ class Id3v2(object):
                 self._read_frames(data)
     
     #---Private
-    def _decode_track(self, track):
-        #The track field can either contain a track number or a string in the
-        #format <trackno>/<trackcount> (Example: 3/14)
-        try:
-            return int(track)
-        except ValueError:
-            if '/' in track:
-                return self._decode_track(track.split('/')[0])
-            else:
-                return 0
-    
     def _get_frame(self, fp):
         if self.version == 2:
             return Id3v22Frame(fp)
@@ -303,14 +292,14 @@ class Id3v2(object):
     def track(self):
         frame_id = cond(self.version >= 3, 'TRCK', 'TRK')
         s = self._get_frame_text_line(frame_id)
-        return self._decode_track(s)
+        return x_from_x_of_y(s)
     
     @property
     def disc(self):
         frame_id = cond(self.version >= 3, 'TPOS', 'TPA')
         s = self._get_frame_text_line(frame_id)
         # Part Of Set has the same formatting rules as Track number
-        return self._decode_track(s)
+        return x_from_x_of_y(s)
 
     @property
     def year(self):
