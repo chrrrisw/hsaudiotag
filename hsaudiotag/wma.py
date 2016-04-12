@@ -10,7 +10,7 @@ import struct
 from struct import unpack
 from io import BytesIO
 
-from .util import FileOrPath
+from .util import FileOrPath, tryint, x_from_x_of_y
 
 #Object IDs
 WMA_ID_SIZE = 16
@@ -31,6 +31,7 @@ TRACK = b'WM/TRACK'
 YEAR = b'WM/YEAR'
 GENRE = b'WM/GENRE'
 DESCRIPTION = b'WM/DESCRIPTION'
+PART_OF_SET = b'WM/PARTOFSET'  # String, x/y formatted
 
 #Max. number of characters in tag field
 WMA_MAX_STRING_SIZE = 250;
@@ -115,6 +116,7 @@ class WMADecoder(object):
         self.comment = ''
         self.year = ''
         self.track = 0
+        self.disc = 0
         self._max_br = 0
         self._avg_br = 0
         self._avg_bytes_per_second = 0
@@ -149,6 +151,13 @@ class WMADecoder(object):
                     self.track = self._fields[TRACK] + 1
                 except (TypeError, KeyError):
                     self.track = 0
+
+                part_of_set = self._fields.get(PART_OF_SET, None)
+                if part_of_set is not None:
+                    self.disc = x_from_x_of_y(part_of_set, 0)
+                else:
+                    self.disc = 0
+
                 if fp.read(WMA_ID_SIZE) == WMA_DATA_ID:
                     self.audio_size = unpack("<i", fp.read(4))[0] - WMA_OB_HEADER_SIZE
                     self.audio_offset = fp.tell()

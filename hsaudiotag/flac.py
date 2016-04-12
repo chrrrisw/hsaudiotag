@@ -87,6 +87,7 @@ class FLAC(object):
         self.year = ''
         self.comment = ''
         self.track = 0
+        self.disc = 0
         self.sample_rate = 0
         self.sample_count = 0
         self.duration = 0
@@ -111,6 +112,7 @@ class FLAC(object):
         self.album = comment.album
         self.title = comment.title
         self.track = comment.track
+        self.disc = comment.disc
         self.year = comment.year
         self.genre = comment.genre
         self.comment = comment.comment

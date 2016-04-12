@@ -48,6 +48,7 @@ class Id3v1(object):
         self.genre = ''
         self.comment = ''
         self.track = 0
+        self.disc = 0
         with FileOrPath(infile) as fp:
             self._read_file(fp)
     

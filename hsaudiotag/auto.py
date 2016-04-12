@@ -25,7 +25,7 @@ EXT2CLASS = {
 }
 
 AUDIO_ATTRS = {'size', 'duration', 'bitrate', 'sample_rate', 'audio_offset', 'audio_size'}
-TAG_ATTRS = {'artist', 'album', 'title', 'genre', 'year', 'track', 'comment'}
+TAG_ATTRS = {'artist', 'album', 'title', 'genre', 'year', 'track', 'comment', 'disc'}
 
 class File:
     """Automatically determine a file type and decode it accordingly, providing a unified interface

@@ -68,6 +68,14 @@ def testTrack():
     tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/test_track.mp3')))
     eq_(tag.track,1)
 
+def testDisc1():
+    tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/disc_1_of_2.mp3')))
+    eq_(tag.disc, 1)
+
+def testDisc2():
+    tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/disc_2_of_2.mp3')))
+    eq_(tag.disc, 2)
+
 def testZeroFile():
     tag = Id3v2(TestData.filepath('zerofile'))
     assert not tag.exists

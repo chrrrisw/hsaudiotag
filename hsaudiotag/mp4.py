@@ -225,6 +225,7 @@ ATOM_SPECS = {
     '©cmt': AttributeAtom,
     '©gen': AttributeAtom,
     'data': AttributeDataAtom,
+    'disk': AttributeAtom,
     'esds': EsdsAtom,
     'gnre': GnreAtom,
     'ilst': AtomBox,
@@ -290,6 +291,10 @@ class File(AtomBox):
     def comment(self):
         return self._get_attr('moov.udta.meta.ilst.©cmt')
     
+    @property
+    def disc(self):
+        return tryint(self._get_attr('moov.udta.meta.ilst.disk'))
+
     @property
     def duration(self):
         atom = self.find('moov.trak.mdia.mdhd')

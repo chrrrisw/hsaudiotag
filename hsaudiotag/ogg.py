@@ -68,9 +68,15 @@ class VorbisComment:
         self.album = get_field(b'ALBUM')
         self.title = get_field(b'TITLE')
         self.genre = get_field(b'GENRE')
+
         track_str = get_field(b'TRACKNUMBER')
         m = RE_STARTS_WITH_DIGIT.match(track_str)
         self.track = int(m.group(0)) if m else 0
+
+        disc_str = get_field(b'DISCNUMBER')
+        m = RE_STARTS_WITH_DIGIT.match(disc_str)
+        self.disc = int(m.group(0)) if m else 0
+
         self.comment = get_field(b'COMMENT')
         self.year = get_field(b'DATE')
         if not self.year:
@@ -98,6 +104,7 @@ class Vorbis:
         self.year = ''
         self.comment = ''
         self.track = 0
+        self.disc = 0
         self.sample_rate = 0
         self.sample_count = 0
         self.duration = 0
@@ -133,6 +140,7 @@ class Vorbis:
         self.album = comment.album
         self.title = comment.title
         self.track = comment.track
+        self.disc = comment.disc
         self.year = comment.year
         self.genre = comment.genre
         self.comment = comment.comment
