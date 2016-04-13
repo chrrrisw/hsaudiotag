@@ -20,7 +20,7 @@ def _do_test(filename, expected):
     eq_(tag.year, expected[5])
     eq_(tag.genre, expected[6])
     eq_(tag.comment, expected[7])
-    eq_(tag.disc, expected[8])
+    eq_(tag.disc, 0)  # Should always be zero - not supported.
 
 
 def _do_test_empty_tag(tagdata):
@@ -41,12 +41,12 @@ def _do_fail(as_filename):
 
 
 def test001():
-    testdata = (TAG_VERSION_1_0, 0, "Title", "Artist", "Album", "2003", "Hip-Hop", "Comment", 0)
+    testdata = (TAG_VERSION_1_0, 0, "Title", "Artist", "Album", "2003", "Hip-Hop", "Comment")
     _do_test("id3v1_001_basic.mp3", testdata)
 
 
 def test002():
-    testdata = (TAG_VERSION_1_1, 12, "Title", "Artist", "Album", "2003", "Hip-Hop", "Comment", 0)
+    testdata = (TAG_VERSION_1_1, 12, "Title", "Artist", "Album", "2003", "Hip-Hop", "Comment")
     _do_test("id3v1_002_basic.mp3", testdata)
 
 
@@ -55,44 +55,44 @@ def test003():
 
 
 def test004():
-    testdata = (TAG_VERSION_1_0, 0, "", "", "", "2003", "Blues", "", 0)
+    testdata = (TAG_VERSION_1_0, 0, "", "", "", "2003", "Blues", "")
     _do_test("id3v1_004_basic.mp3", testdata)
 
 
 def test005():
     testdata = (TAG_VERSION_1_0, 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaA", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbB",
-                "cccccccccccccccccccccccccccccC", "2003", "Blues", "dddddddddddddddddddddddddddddD", 0)
+                "cccccccccccccccccccccccccccccC", "2003", "Blues", "dddddddddddddddddddddddddddddD")
     _do_test("id3v1_005_basic.mp3", testdata)
 
 
 def test006():
     testdata = (TAG_VERSION_1_1, 1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaA", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbB",
-                "cccccccccccccccccccccccccccccC", "2003", "Blues", "dddddddddddddddddddddddddddD", 0)
+                "cccccccccccccccccccccccccccccC", "2003", "Blues", "dddddddddddddddddddddddddddD")
     _do_test("id3v1_006_basic.mp3", testdata)
 
 
 def test007():
-    testdata = (TAG_VERSION_1_0, 0, "12345", "12345", "12345", "2003", "Blues", "12345", 0)
+    testdata = (TAG_VERSION_1_0, 0, "12345", "12345", "12345", "2003", "Blues", "12345")
     _do_test("id3v1_007_basic_W.mp3", testdata)
 
 
 def test008():
-    testdata = (TAG_VERSION_1_1, 1, "12345", "12345", "12345", "2003", "Blues", "12345", 0)
+    testdata = (TAG_VERSION_1_1, 1, "12345", "12345", "12345", "2003", "Blues", "12345")
     _do_test("id3v1_008_basic_W.mp3", testdata)
 
 
 def test009():
-    testdata = (TAG_VERSION_1_1, 99, "", "", "", "2003", "Blues", "", 0)
+    testdata = (TAG_VERSION_1_1, 99, "", "", "", "2003", "Blues", "")
     _do_test("id3v1_009_basic.mp3", testdata)
 
 
 def test010():
-    testdata = (TAG_VERSION_1_0, 0, "", "", "", "0000", "Blues", "", 0)
+    testdata = (TAG_VERSION_1_0, 0, "", "", "", "0000", "Blues", "")
     _do_test("id3v1_010_year.mp3", testdata)
 
 
 def test011():
-    testdata = (TAG_VERSION_1_0, 0, "", "", "", "9999", "Blues", "", 0)
+    testdata = (TAG_VERSION_1_0, 0, "", "", "", "9999", "Blues", "")
     _do_test("id3v1_011_year.mp3", testdata)
 
 
@@ -101,17 +101,17 @@ def test011():
 # formated year field. The test suite flag the 3 next files as failures
 # but I will not do so in my testcase
 def test012():
-    testdata = (TAG_VERSION_1_0, 0, "", "", "", "\x20\x20\x203", "Blues", "", 0)
+    testdata = (TAG_VERSION_1_0, 0, "", "", "", "\x20\x20\x203", "Blues", "")
     _do_test("id3v1_012_year_F.mp3", testdata)
 
 
 def test013():
-    testdata = (TAG_VERSION_1_0, 0, "", "", "", "112", "Blues", "", 0)
+    testdata = (TAG_VERSION_1_0, 0, "", "", "", "112", "Blues", "")
     _do_test("id3v1_013_year_F.mp3", testdata)
 
 
 def test014():
-    testdata = (TAG_VERSION_1_0, 0, "", "", "", "", "Blues", "", 0)
+    testdata = (TAG_VERSION_1_0, 0, "", "", "", "", "Blues", "")
     _do_test("id3v1_014_year_F.mp3", testdata)
 
 
