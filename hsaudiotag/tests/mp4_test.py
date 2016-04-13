@@ -484,6 +484,8 @@ def test_file_test2():
     eq_('Odelay', f.album)
     eq_('Alternative', f.genre)
     eq_('This is a test', f.comment)
+    eq_(8, f.track)
+    eq_(1, f.disc)
     eq_(754518, f.size)
     eq_(44100, f.sample_rate)
     eq_(11, f.duration)
@@ -501,6 +503,7 @@ def test_file_test3():
     eq_('Danse sociale', f.album)
     eq_('Punk', f.genre)
     eq_('', f.comment)
+    eq_(2, f.track)
     eq_(3813888, f.size)
     eq_(44100, f.sample_rate)
     eq_(235, f.duration)
@@ -510,12 +513,16 @@ def test_file_test3():
 def test_file_test4():
     f = mp4.File(expand_mp4(TestData.filepath('mp4/test4.m4a')))
     eq_('2005', f.year)
+    eq_(1, f.track)
+    eq_(1, f.disc)
 
 
 def test_file_test5():
     f = mp4.File(expand_mp4(TestData.filepath('mp4/test5.m4a')))
     eq_('Hip Hop/Rap', f.genre)
     eq_(128, f.bitrate)
+    eq_(5, f.track)
+    eq_(1, f.disc)
 
 
 def test_file_test6():
@@ -525,7 +532,8 @@ def test_file_test6():
     eq_(128, f.bitrate)
     eq_(0x7b00b, f.audio_offset)
     eq_(0x279d23, f.audio_size)
-
+    eq_(2, f.track)
+    eq_(1, f.disc)
 
 def test_file_test7():
     # This file is a lossless aac file.
@@ -536,6 +544,8 @@ def test_file_test7():
     eq_('Hip Hop/Rap', f.genre)
     eq_(0, f.bitrate)
     eq_(60, f.duration)
+    eq_(1, f.track)
+    eq_(1, f.disc)
 
 
 def test_non_ascii_genre():
