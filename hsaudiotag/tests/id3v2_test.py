@@ -79,13 +79,18 @@ def testTrack():
     eq_(tag.track, 1)
 
 
-def testDisc1():
-    tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/disc_1_of_2.mp3')))
+def testDisc1of2():
+    tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/disc_1_of_2.tag')))
     eq_(tag.disc, 1)
 
 
+def testDisc2of2():
+    tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/disc_2_of_2.tag')))
+    eq_(tag.disc, 2)
+
+
 def testDisc2():
-    tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/disc_2_of_2.mp3')))
+    tag = Id3v2(expand_mpeg(TestData.filepath('id3v2/disc_2.tag')))
     eq_(tag.disc, 2)
 
 
