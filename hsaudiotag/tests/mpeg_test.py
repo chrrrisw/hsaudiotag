@@ -164,6 +164,8 @@ class TestMpeg:
         assert m.vbr
         eq_(m.bitrate, 211)
         eq_(m.duration, 193)
+        assert m.id3v2.exists
+        eq_(1, m.tag.disc)
 
     def test_tell_returns_None(self):
         # See TCFrameBrowser test with the same name for comments
