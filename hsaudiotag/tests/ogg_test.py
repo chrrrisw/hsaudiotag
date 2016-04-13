@@ -57,6 +57,16 @@ def test_file_valid_on_test1():
     eq_(o.audio_size, 101785 - 0x1158)
 
 
+def test_disc_1():
+    o = ogg.Vorbis(TestData.filepath('ogg/test1_disc_1.ogg'))
+    eq_(o.disc, 1)
+
+
+def test_disc_1_of_1():
+    o = ogg.Vorbis(TestData.filepath('ogg/test1_disc_1_of_1.ogg'))
+    eq_(o.disc, 1)
+
+
 def test_file_valid_on_test2():
     o = ogg.Vorbis(TestData.filepath('ogg/test2.ogg'))
     eq_(103168, o.size)
