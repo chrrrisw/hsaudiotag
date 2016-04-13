@@ -29,6 +29,12 @@ def test1():
     assert w.valid
 
 
+def test1_disc1():
+    # test1.wma is a normal, valid wma file
+    w = wma.WMADecoder(TestData.filepath('wma/test1_disc_1_of_1.wma'))
+    eq_(w.disc, 1)
+
+
 def test2():
     # test2.wma is a mpeg file, thus invalid
     w = wma.WMADecoder(TestData.filepath('wma/test2.wma'))
