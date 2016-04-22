@@ -10,7 +10,7 @@ import struct
 from struct import unpack
 from io import BytesIO
 
-from .util import FileOrPath
+from .util import FileOrPath, tryint
 
 # Object IDs
 WMA_ID_SIZE = 16
@@ -27,7 +27,8 @@ WMA_STREAM_BITRATE_PROPERTIES_ID    = b'\xce\x75\xf8\x7b\x8d\x46\xd1\x11\x8d\x82
 TITLE = b'WM/TITLE'
 ARTIST = b'WM/AUTHOR'
 ALBUM = b'WM/ALBUMTITLE'
-TRACK = b'WM/TRACK'
+TRACK = b'WM/TRACK'  # String or DWORD, zero based, deprecated
+TRACKNUMBER = b'WM/TRACKNUMBER'  # String or DWORD, one based
 YEAR = b'WM/YEAR'
 GENRE = b'WM/GENRE'
 DESCRIPTION = b'WM/DESCRIPTION'
@@ -165,10 +166,18 @@ class WMADecoder(object):
                 self.genre = self._fields.get(GENRE, '')
                 self.comment = self._fields.get(DESCRIPTION, '')
                 self.year = self._fields.get(YEAR, '')
-                try:
-                    self.track = self._fields[TRACK] + 1
-                except (TypeError, KeyError):
-                    self.track = 0
+
+                # Try TRACKNUMBER first
+                track = self._fields.get(TRACKNUMBER, None)
+                if track is not None:
+                    self.track = tryint(track, 0)
+                else:
+                    track = self._fields.get(TRACK, None)
+                    if track is not None:
+                        self.track = tryint(track, -1) + 1
+                    else:
+                        self.track = 0
+
                 if fp.read(WMA_ID_SIZE) == WMA_DATA_ID:
                     self.audio_size = unpack("<i", fp.read(4))[0] - WMA_OB_HEADER_SIZE
                     self.audio_offset = fp.tell()
