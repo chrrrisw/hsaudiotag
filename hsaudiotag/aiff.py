@@ -42,6 +42,12 @@ def read_float(s):  # 10 bytes
 
 
 class Chunk:
+    '''Parent class for File.
+
+    :param file fp: The file object to process.
+    :ivar int ~aiff.Chunk.position: The position of the Chunk within the file.
+    :raises NotAChunk: If not a Chunk.
+    '''
     def __init__(self, fp):
         self._fp = fp
         self.position = fp.tell()
@@ -59,6 +65,19 @@ class Chunk:
 
 
 class File(Chunk):
+    '''The class used to hold the metadata for an AIFF file.
+
+    :param str infile: The file to process.
+
+    :ivar int ~aiff.File.audio_offset: The offset, in bytes, at which audio data starts in the file.
+    :ivar int ~aiff.File.audio_size: The size of the audio part of the file in bytes.
+    :ivar int ~aiff.File.bitrate: The bitrate of the audio file.
+    :ivar int ~aiff.File.duration: The duration of the audio file (in whole seconds).
+    :ivar int ~aiff.File.sample_rate: The sample rate of the audio file.
+    :ivar ~aiff.File.tag: The metadata object.
+    :vartype tag: :class:`hsaudiotag.id3v2.Id3v2`
+    :ivar bool ~aiff.File.valid: Whether the file could correctly be read or not.
+    '''
     def __init__(self, infile):
         self.valid = False
         self.tag = None
@@ -72,6 +91,7 @@ class File(Chunk):
                 return
 
     def read(self):
+        '''Read and interpret each Chunk in the File. Called internally on construction.'''
         # the FORM chunk (the main chunk) has 4 bytes for the type, then the subchunks
         self._fp.seek(4, 1)
         while True:

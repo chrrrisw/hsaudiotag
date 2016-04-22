@@ -189,6 +189,10 @@ class Id3v23Frame(Id3Frame):
 
 
 class Id3v2(object):
+    '''The class used to handle ID3 version 2 metadata.
+
+    :param infile: The file object or path to process.
+    '''
     def __init__(self, infile):
         self.position = POS_BEGIN
         self._extheader = None
@@ -264,34 +268,39 @@ class Id3v2(object):
         return result.replace('\n', ' ').replace('\r', ' ')
 
     # --- Properties
-    size = property(lambda self: self._header.tagsize)
-    data_size = property(lambda self: self._header.datasize)
-    exists = property(lambda self: self._header.valid)
-    flags = property(lambda self: self._header.hflags)
-    version = property(lambda self: self._header.vmajor)
+    size = property(lambda self: self._header.tagsize)  #: The size of the file, in bytes.
+    data_size = property(lambda self: self._header.datasize)  #: The size of the data, in bytes.
+    exists = property(lambda self: self._header.valid)  #: Whether data is valid
+    flags = property(lambda self: self._header.hflags)  #: The header flags
+    version = property(lambda self: self._header.vmajor)  #: The major version
 
     @property
     def album(self):
+        '''The album on which the audio appears.'''
         frame_id = cond(self.version >= 3, 'TALB', 'TAL')
         return self._get_frame_text_line(frame_id)
 
     @property
     def artist(self):
+        '''The artist associated with the audio.'''
         frame_id = cond(self.version >= 3, 'TPE1', 'TP1')
         return self._get_frame_text_line(frame_id)
 
     @property
     def comment(self):
+        '''The comment in the audio file.'''
         frame_id = cond(self.version >= 3, 'COMM', 'COM')
         return self._get_frame_text(frame_id)
 
     @property
     def duration(self):
+        '''The duration of the audio file (in whole seconds).'''
         s = self._get_frame_text('TLEN')
         return tryint(s) // 1000
 
     @property
     def genre(self):
+        '''The genre associated with the audio.'''
         frame_id = cond(self.version >= 3, 'TCON', 'TCO')
         genre = self._get_frame_text_line(frame_id)
         match = re_numeric_genre.match(genre)
@@ -303,16 +312,19 @@ class Id3v2(object):
 
     @property
     def title(self):
+        '''The title associated with the audio.'''
         frame_id = cond(self.version >= 3, 'TIT2', 'TT2')
         return self._get_frame_text_line(frame_id)
 
     @property
     def track(self):
+        '''The track number associated with the audio.'''
         frame_id = cond(self.version >= 3, 'TRCK', 'TRK')
         s = self._get_frame_text_line(frame_id)
         return self._decode_track(s)
 
     @property
     def year(self):
+        '''The year in which the audio was recorded.'''
         frame_id = cond(self.version >= 3, 'TYER', 'TYE')
         return self._get_frame_text_line(frame_id)

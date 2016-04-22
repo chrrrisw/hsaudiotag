@@ -37,11 +37,20 @@ class FileOrPath:
 
 def cond(condition, true_value, false_value):
     """Return true_value if condition is true, and false_value otherwise.
+
+    :param bool condition: The condition to evaluate.
+    :param true_value: Value to return if condition evaluates True.
+    :param false_value: Value to return if condition evaluates False.
     """
     return true_value if condition else false_value
 
 
 def tryint(value, default=0):
+    '''Attempt to cast the given value to an integer, return the default if an exception occurs.
+
+    :param value: The value to cast.
+    :param int default: The default on error.
+    '''
     try:
         return int(value)
     except (TypeError, ValueError):

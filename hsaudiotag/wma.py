@@ -37,6 +37,25 @@ WMA_MAX_STRING_SIZE = 250
 
 
 class WMADecoder(object):
+    '''The class used to handle ID3 version 2 metadata.
+
+    :param infile: The file object or path to process.
+
+    :ivar str ~wma.WMADecoder.album: The album on which the audio appears.
+    :ivar str ~wma.WMADecoder.artist: The artist associated with the audio.
+    :ivar int ~wma.WMADecoder.audio_offset: The offset, in bytes, at which audio data starts in the file.
+    :ivar int ~wma.WMADecoder.audio_size: The size of the audio part of the file in bytes.
+    :ivar int ~wma.WMADecoder.channels: The number of channels in the audio data.
+    :ivar str ~wma.WMADecoder.comment: A comment in the audio file.
+    :ivar int ~wma.WMADecoder.duration: The duration of the audio file (in whole seconds).
+    :ivar str ~wma.WMADecoder.genre: The genre associated with the audio.
+    :ivar int ~wma.WMADecoder.sample_rate: The sample rate of the audio file.
+    :ivar int ~wma.WMADecoder.size: The size of the file, in bytes.
+    :ivar str ~wma.WMADecoder.title: The title associated with the audio.
+    :ivar int ~wma.WMADecoder.track: The track number associated with the audio.
+    :ivar bool ~wma.WMADecoder.valid: Whether the file could correctly be read or not.
+    :ivar str ~wma.WMADecoder.year: The year in which the audio was recorded.
+    '''
     def __init__(self, infile):
         with FileOrPath(infile) as fp:
             self._read_file(fp)
@@ -161,4 +180,5 @@ class WMADecoder(object):
 
     @property
     def bitrate(self):
+        '''The bitrate of the audio file.'''
         return (self._avg_br * 8) // 1000

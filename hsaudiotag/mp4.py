@@ -160,7 +160,7 @@ class AttributeDataAtom(Atom):
 
     def _read_atom_data(self):
         result = Atom._read_atom_data(self)
-        #Convert to unicode if needed
+        # Convert to unicode if needed
         if isinstance(result[2], bytes):
             result = list(result)
             result[2] = result[2].decode('utf-8', 'ignore')
@@ -248,6 +248,10 @@ ATOM_SPECS = {
 
 
 class File(AtomBox):
+    '''The class used to handle MP4 (m4a, m4p) metadata.
+
+    :param infile: The file path to process.
+    '''
     def __init__(self, infile):
         self._fp, self._shouldclose = open_if_filename(infile, 'rb')
         self._fp.seek(0, 2)
@@ -270,38 +274,46 @@ class File(AtomBox):
 
     @property
     def album(self):
+        '''The album on which the audio appears.'''
         return self._get_attr('moov.udta.meta.ilst.©alb')
 
     @property
     def artist(self):
+        '''The artist associated with the audio.'''
         return self._get_attr('moov.udta.meta.ilst.©ART')
 
     @property
     def audio_offset(self):
+        '''The offset, in bytes, at which audio data starts in the file.'''
         atoms = [a for a in self.atoms if (a.size > 8) and (a.type == 'mdat')]
         return atoms[0].start_offset if atoms else 0
 
     @property
     def audio_size(self):
+        '''The size of the audio part of the file in bytes.'''
         atoms = [a for a in self.atoms if (a.size > 8) and (a.type == 'mdat')]
         return atoms[0].size if atoms else 0
 
     @property
     def bitrate(self):
+        '''The bitrate of the audio file.'''
         atom = self.find('moov.trak.mdia.minf.stbl.stsd.esds')
         return atom.bitrate // 1000 if atom else 0
 
     @property
     def comment(self):
+        '''The comment in the audio file.'''
         return self._get_attr('moov.udta.meta.ilst.©cmt')
 
     @property
     def duration(self):
+        '''The duration of the audio file (in whole seconds).'''
         atom = self.find('moov.trak.mdia.mdhd')
         return atom.duration // self.sample_rate if atom else 0
 
     @property
     def genre(self):
+        '''The genre associated with the audio.'''
         data = self._get_attr('moov.udta.meta.ilst.gnre')
         if not data:
             data = self._get_attr('moov.udta.meta.ilst.©gen')
@@ -314,21 +326,26 @@ class File(AtomBox):
 
     @property
     def sample_rate(self):
+        '''The sample rate of the audio file.'''
         atom = self.find('moov.trak.mdia.mdhd')
         return atom.sample_rate if atom else 0
 
     @property
     def title(self):
+        '''The title associated with the audio.'''
         return self._get_attr('moov.udta.meta.ilst.©nam')
 
     @property
     def track(self):
+        '''The track number associated with the audio.'''
         return tryint(self._get_attr('moov.udta.meta.ilst.trkn'))
 
     @property
     def valid(self):
+        '''Whether the file could correctly be read or not.'''
         return self.find('mdat') is not None
 
     @property
     def year(self):
+        '''The year in which the audio was recorded.'''
         return self._get_attr('moov.udta.meta.ilst.©day')[:4]

@@ -65,8 +65,8 @@ MAX_SEEK_BYTES = 4096
 
 
 def get_vbr_offset(version, channel_mode):
-    #Depending on mpeg version and mode, the VBR header will be at a different offset
-    #after the mpeg header.
+    # Depending on mpeg version and mode, the VBR header will be at a different offset
+    # after the mpeg header.
     if version == ID_MPEG1:
         if channel_mode == MPEG_CM_MONO:
             return 17
@@ -239,6 +239,20 @@ def get_vbr_info(fp, b):
 
 
 class Mpeg:
+    '''The class used to handle MPEG metadata.
+
+    :param infile: The file object or path to process.
+
+    :ivar int ~mpeg.Mpeg.audio_offset: The offset, in bytes, at which audio data starts in the file.
+    :ivar int ~mpeg.Mpeg.duration: The duration of the audio file (in whole seconds).
+    :ivar ~mpeg.Mpeg.id3v1: The ID3 version 1 metadata, if present.
+    :vartype id3v1: :class:`hsaudiotag.id3v1.Id3v1`
+    :ivar ~mpeg.Mpeg.id3v2: The ID3 version 2 metadata, if present.
+    :vartype id3v2: :class:`hsaudiotag.id3v2.Id3v2`
+    :ivar int ~mpeg.Mpeg.size: The size of the file, in bytes.
+    :ivar ComputedVBRHeader ~mpeg.Mpeg.vbr:
+    :ivar bool ~mpeg.Mpeg.valid: Whether the file could correctly be read or not.
+    '''
     def __init__(self, infile):
         with FileOrPath(infile) as fp:
             self.id3v1 = id3v1.Id3v1(fp)
@@ -270,6 +284,9 @@ class Mpeg:
     # --- Properties
     @property
     def tag(self):
+        '''The :class:`hsaudiotag.id3v2.Id3v2` or :class:`hsaudiotag.id3v1.Id3v1`
+        metadata object associated with the MPEG file.
+        '''
         if self.id3v2.exists:
             return self.id3v2
         elif self.id3v1.exists:
@@ -277,6 +294,7 @@ class Mpeg:
 
     @property
     def audio_size(self):
+        '''The size of the audio part of the file in bytes.'''
         result = self.size - self.id3v1.size - self.audio_offset
         if self.id3v2.position == id3v2.POS_END:
             result -= self.id3v2.size
@@ -284,6 +302,7 @@ class Mpeg:
 
     @property
     def bitrate(self):
+        '''The bitrate of the audio file.'''
         if self.vbr and (self.vbr.frames > 0):
             coeff = get_vbr_coefficient(self._frameheader.mpeg_id, self._frameheader.layer)
             pad = self._frameheader.padding_size
@@ -295,4 +314,5 @@ class Mpeg:
 
     @property
     def sample_rate(self):
+        '''The sample rate of the audio file.'''
         return self._frameheader.sample_rate

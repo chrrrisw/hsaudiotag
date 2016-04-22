@@ -159,4 +159,8 @@ MUSIC_GENRES = (
 
 
 def genre_by_index(index):
+    '''Return the string representation of a genre, based on index.
+
+    :param int index: The index for the genre.
+    '''
     return MUSIC_GENRES[index] if index >= 0 and index < len(MUSIC_GENRES) else ''

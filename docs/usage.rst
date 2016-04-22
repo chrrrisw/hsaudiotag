@@ -1,3 +1,4 @@
+================
 Using hsaudiotag
 ================
 
@@ -18,8 +19,11 @@ Available attributes
 valid
     Whether the file could correctly be read or not.
 
-artist - album - title - genre - year - track - comment
-    Tags present in the audio file. All strings, return an empty string is not present.
+artist - album - title - genre - year - comment
+    Tags present in the audio file. All strings, return an empty string if not present.
+
+track
+    The track tag in the audio file. Integer (zero if not present)
 
 duration
     Duration of the audio file, in seconds (always as integer).
@@ -44,17 +48,17 @@ The ``mpeg.Mpeg`` and ``aiff.File`` classes are special cases where tags are con
 Available classes
 =================
 
-* ``mpeg.Mpeg`` for mp3 files.
-* ``mp4.File`` for mp4 files.
-* ``wma.WMADecoder`` for wma files.
-* ``ogg.Vorbis`` for ogg files.
-* ``flac.FLAC`` for flac files.
-* ``aiff.File`` for aiff files.
+* :class:`hsaudiotag.mpeg.Mpeg` for mp3 files.
+* :class:`hsaudiotag.mp4.File` for mp4 files.
+* :class:`hsaudiotag.wma.WMADecoder` for wma files.
+* :class:`hsaudiotag.ogg.Vorbis` for ogg files.
+* :class:`hsaudiotag.flac.FLAC` for flac files.
+* :class:`hsaudiotag.aiff.File` for aiff files.
 
 auto.File
 =========
 
-Since v1.1, there's a new wrapper class, ``auto.File`` which automatically detects the type of the
+Since v1.1, there's a new wrapper class, :class:`hsaudiotag.auto.File` which automatically detects the type of the
 file and provides a unified interface to its attributes (something the different classes of
 ``hsaudiotag`` don't have). To use it, instantiate it like you would with any other class, that is
 ``auto.File(filename_or_file_object)``. All the attributes are in the wrapper, but if you want to

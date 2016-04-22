@@ -84,6 +84,26 @@ class VorbisComment:
 
 
 class Vorbis:
+    '''The class used to handle OGG Vorbis metadata.
+
+    :param infile: The file object or path to process.
+
+    :ivar str ~ogg.Vorbis.album: The album on which the audio appears.
+    :ivar str ~ogg.Vorbis.artist: The artist associated with the audio.
+    :ivar int ~ogg.Vorbis.audio_offset: The offset, in bytes, at which audio data starts in the file.
+    :ivar int ~ogg.Vorbis.audio_size: The size of the audio part of the file in bytes.
+    :ivar int ~ogg.Vorbis.bitrate: The bitrate of the audio file.
+    :ivar str ~ogg.Vorbis.comment: A comment in the audio file.
+    :ivar int ~ogg.Vorbis.duration: The duration of the audio file (in whole seconds).
+    :ivar str ~ogg.Vorbis.genre: The genre associated with the audio.
+    :ivar int ~ogg.Vorbis.sample_count:
+    :ivar int ~ogg.Vorbis.sample_rate: The sample rate of the audio file.
+    :ivar int ~ogg.Vorbis.size: The size of the file, in bytes.
+    :ivar str ~ogg.Vorbis.title: The title associated with the audio.
+    :ivar int ~ogg.Vorbis.track: The track number associated with the audio.
+    :ivar bool ~ogg.Vorbis.valid: Whether the file could correctly be read or not.
+    :ivar str ~ogg.Vorbis.year: The year in which the audio was recorded.
+    '''
     def __init__(self, infile):
         with FileOrPath(infile, 'rb') as fp:
             try:

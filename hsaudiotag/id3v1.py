@@ -38,6 +38,22 @@ def _arrange_id3_field(raw_field):
 
 
 class Id3v1(object):
+    '''.. :class:: Id3v1
+
+    The class used to handle ID3 version 1 metadata.
+
+    :param infile: The file object or path to process.
+    :ivar str ~id3v1.Id3v1.album: The album on which the audio appears.
+    :ivar str ~id3v1.Id3v1.artist: The artist associated with the audio.
+    :ivar str ~id3v1.Id3v1.comment: A comment in the audio file.
+    :ivar str ~id3v1.Id3v1.genre: The genre associated with the audio.
+    :ivar int ~id3v1.Id3v1.size: The size of the file, in bytes.
+    :ivar str ~id3v1.Id3v1.title: The title associated with the audio.
+    :ivar int ~id3v1.Id3v1.track: The track number associated with the audio.
+    :ivar int ~id3v1.Id3v1.version: The version of the tag found in the file.
+    :ivar str ~id3v1.Id3v1.year: The year in which the audio was recorded.
+    '''
+
     def __init__(self, infile):
         self.version = 0
         self.size = 0
@@ -81,4 +97,5 @@ class Id3v1(object):
 
     @property
     def exists(self):
+        '''True if size is greater than zero.'''
         return self.size > 0
