@@ -19,3 +19,4 @@ Contents
 
    install
    usage
+   classes

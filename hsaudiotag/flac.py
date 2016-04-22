@@ -71,6 +71,27 @@ BLOCK_CLASSES = {
 
 
 class FLAC(object):
+    '''The class used to hold the metadata for a FLAC file.
+
+    :param infile: The file object or path to process.
+
+    :ivar str ~flac.FLAC.album: The album on which the audio appears.
+    :ivar str ~flac.FLAC.artist: The artist associated with the audio.
+    :ivar int ~flac.FLAC.audio_offset: The offset, in bytes, at which audio data starts in the file.
+    :ivar int ~flac.FLAC.audio_size: The size of the audio part of the file in bytes.
+    :ivar int ~flac.FLAC.bitrate: The bitrate of the audio file.
+    :ivar str ~flac.FLAC.comment: A comment in the audio file.
+    :ivar int ~flac.FLAC.duration: The duration of the audio file (in whole seconds).
+    :ivar str ~flac.FLAC.genre: The genre associated with the audio.
+    :ivar int ~flac.FLAC.sample_count:
+    :ivar int ~flac.FLAC.sample_rate: The sample rate of the audio file.
+    :ivar int ~flac.FLAC.size: The size of the file, in bytes.
+    :ivar str ~flac.FLAC.title: The title associated with the audio.
+    :ivar int ~flac.FLAC.track: The track number associated with the audio.
+    :ivar int ~flac.FLAC.disc: The disc number associated with the audio.
+    :ivar bool ~flac.FLAC.valid: Whether the file could correctly be read or not.
+    :ivar str ~flac.FLAC.year: The year in which the audio was recorded.
+    '''
     ID = b'fLaC'
 
     def __init__(self, infile):

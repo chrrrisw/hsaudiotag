@@ -56,9 +56,15 @@ def test1_non_ascii():
 
 
 def test1_no_track():
-    # This is a file with no WM/TRACK field
+    # This is a file with no WM/TRACK or WM/TRACKNUMBER field
     w = wma.WMADecoder(TestData.filepath('wma/test1_no_track.wma'))
     eq_(0, w.track)
+
+
+def test1_track_no_tracknumber():
+    # This is a file with no WM/TRACKNUMBER field
+    w = wma.WMADecoder(TestData.filepath('wma/test1_track_no_tracknumber.wma'))
+    eq_(1, w.track)
 
 
 def test3():
@@ -70,7 +76,7 @@ def test3():
     eq_(w.genre, 'Easy Listening')
     eq_(w.comment, '')
     eq_(w.year, '')
-    eq_(w.track, 0)
+    eq_(w.track, 11)
     eq_(w.disc, 0)
     eq_(w.bitrate, 48)
     eq_(w.size, 80767)
